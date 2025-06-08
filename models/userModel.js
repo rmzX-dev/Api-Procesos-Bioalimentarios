@@ -1,12 +1,13 @@
-const pool = require("../config/db");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import pool from "../config/db.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
 const SALT_ROUNDS = 10;
 
 class User {
   static async findUser() {
     const result = await pool.query("SELECT * FROM usuarios");
-    return result.rows[0];
+    return result.rows;
   }
 
   static async findUserById(id_usuario) {
@@ -73,6 +74,14 @@ class User {
     return result.rows[0];
   }
 
+  static async deleteUser(id_usuario) {
+    const result = await pool.query(
+      "DELETE FROM usuarios WHERE id_usuario = $1 RETURNING *;",
+      [id_usuario]
+    );
+    return result.rows[0];
+  }
+
   static async loginUser(data) {
     const { correo, contrasenia } = data;
 
@@ -101,7 +110,7 @@ class User {
         status: 200,
         message: "Login exitoso",
         token,
-        user: { id: user.id_usuario, correo: user.correo, rol: user.id_rol },
+        user: { id: user.id_usuario, correo: user.correo /* rol: user.id_rol (if you have) */ },
       };
     } catch (error) {
       console.error("Error en loginUser:", error);
@@ -110,4 +119,4 @@ class User {
   }
 }
 
-module.exports = User;
+export default User;
