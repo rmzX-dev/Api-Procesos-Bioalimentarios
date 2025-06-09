@@ -1,4 +1,4 @@
-const User = require("../models/userModel.js");
+import User from "../models/userModel.js";
 
 class UserController {
   static async findAllUsers(req, res) {
@@ -35,9 +35,7 @@ class UserController {
     try {
       const user = await User.updateUser(req.params.id, req.body);
       if (!user) {
-        return res
-          .status(404)
-          .json({ message: "User not found or already deleted" });
+        return res.status(404).json({ message: "User not found or already deleted" });
       }
       res.json(user);
     } catch (error) {
@@ -49,9 +47,7 @@ class UserController {
     const { correo, contrasenia } = req.body;
 
     if (!correo || !contrasenia) {
-      return res
-        .status(400)
-        .json({ message: "Correo y contraseña son requeridos" });
+      return res.status(400).json({ message: "Correo y contraseña son requeridos" });
     }
 
     try {
@@ -70,9 +66,7 @@ class UserController {
     try {
       const user = await User.deleteUser(req.params.id);
       if (!user) {
-        return res
-          .status(404)
-          .json({ message: "User not found or already deleted" });
+        return res.status(404).json({ message: "User not found or already deleted" });
       }
       res.json(user);
     } catch (error) {
@@ -81,4 +75,4 @@ class UserController {
   }
 }
 
-module.exports = UserController;
+export default UserController;
