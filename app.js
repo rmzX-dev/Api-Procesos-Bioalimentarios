@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes.js";
 import clientRoutes from "./routes/clientRoutes.js";
+import sampleRoutes from "./routes/sampleRoutes.js";
+import analysisRoutes from "./routes/analysisRoutes.js";
 import swaggerDocs from "./config/swagger.js";
 
 dotenv.config();
@@ -18,6 +20,8 @@ swaggerDocs(app);
 // Rutas de la API
 app.use("/api", userRoutes);
 app.use("/api", clientRoutes);
+app.use("/api", sampleRoutes);
+app.use("/api", analysisRoutes);
 
 
 const PORT = process.env.PORT || 3000;
