@@ -1,5 +1,5 @@
 CREATE TABLE usuarios (
-    idUsuario INT PRIMARY KEY,
+    idUsuario INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(40) NOT NULL,
     apellidoPaterno VARCHAR(40) NOT NULL,
     apellidoMaterno VARCHAR(40),
@@ -10,7 +10,7 @@ CREATE TABLE usuarios (
 );
 
 CREATE TABLE clientes (
-    idCliente INT PRIMARY KEY,
+    idCliente INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(40) NOT NULL,
     apellidoPaterno VARCHAR(40) NOT NULL,
     apellidoMaterno VARCHAR(40),
@@ -21,20 +21,8 @@ CREATE TABLE clientes (
     acreditacion VARCHAR(255) NOT NULL
 );
 
-
-CREATE TABLE bitacora (
-    idBitacora INT PRIMARY KEY,
-    idUsuario INT NOT NULL,
-    idCliente INT NOT NULL,
-    accion VARCHAR(50) NOT NULL,
-    fechaRegistro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    detalles TEXT,
-    CONSTRAINT fk_bitacora_usuario FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario),
-    CONSTRAINT fk_bitacora_cliente FOREIGN KEY (idCliente) REFERENCES clientes(idCliente)
-);
-
 CREATE TABLE muestra (
-    idMuestra INT PRIMARY KEY,
+    idMuestra INT PRIMARY KEY AUTO_INCREMENT,
     idCliente INT NOT NULL,
     folio VARCHAR(20) UNIQUE NOT NULL,
     descripcion TEXT NOT NULL,
@@ -44,50 +32,95 @@ CREATE TABLE muestra (
     CONSTRAINT fk_muestra_cliente FOREIGN KEY (idCliente) REFERENCES clientes(idCliente)
 );
 
-CREATE TABLE humedad (
-    idHumedad INT PRIMARY KEY,
-    idMuestra INT NOT NULL,
-    resultado DECIMAL(10,4) NOT NULL,
-    unidad VARCHAR(20) NOT NULL,
-    fechaAnalisis DATE NOT NULL,
-    CONSTRAINT fk_humedad_muestra FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra)
-);
-
-CREATE TABLE proteina (
-    idProteina INT PRIMARY KEY,
-    idMuestra INT NOT NULL,
-    resultado DECIMAL(10,4) NOT NULL,
-    unidad VARCHAR(20) NOT NULL,
-    fechaAnalisis DATE NOT NULL,
-    CONSTRAINT fk_proteina_muestra FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra)
-);
-
-CREATE TABLE ceniza (
-    idCeniza INT PRIMARY KEY,
-    idMuestra INT NOT NULL,
-    resultado DECIMAL(10,4) NOT NULL,
-    unidad VARCHAR(20) NOT NULL,
-    fechaAnalisis DATE NOT NULL,
-    CONSTRAINT fk_ceniza_muestra FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra)
-);
-
 CREATE TABLE analisis (
-    idAnalisis INT PRIMARY KEY,
+    idAnalisis INT PRIMARY KEY AUTO_INCREMENT,
     idMuestra INT NOT NULL,
-    idAnalista INT NOT NULL,
-    tipoAnalisis VARCHAR(50) NOT NULL,
-    resultado DECIMAL(10,4) NOT NULL,
+    tipo VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_analisis_muestra FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra)
+);
+
+CREATE TABLE analisisProteinas(
+    idAnalisisProteinas INT PRIMARY KEY AUTO_INCREMENT,
+    idAnalisis INT NOT NULL,
+    resultado NUMERIC(10,2) NOT NULL,
+    unidad VARCHAR(20) NOT NULL, 
+    metodoReferencia VARCHAR(100) NOT NULL,
+    acreditacion VARCHAR(10) NOT NULL,
+    CONSTRAINT fk_analisisProteinas_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+);
+
+CREATE TABLE analisisCenizas(
+    idAnalisisCenizas INT PRIMARY KEY AUTO_INCREMENT,
+    idAnalisis INT NOT NULL,
+    resultado NUMERIC(10,2) NOT NULL,
+    unidad VARCHAR(20) NOT NULL, 
+    metodoReferencia VARCHAR(100) NOT NULL,
+    acreditacion VARCHAR(10) NOT NULL,
+    CONSTRAINT fk_analisisCenizas_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+);
+
+CREATE TABLE analisisHumedad(
+    idAnalisisHumedad INT PRIMARY KEY AUTO_INCREMENT,
+    idAnalisis INT NOT NULL,
+    resultado NUMERIC(10,2) NOT NULL,
+    unidad VARCHAR(20) NOT NULL, 
+    metodoReferencia VARCHAR(100) NOT NULL,
+    acreditacion VARCHAR(10) NOT NULL,
+    CONSTRAINT fk_analisisHumedad_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+);
+
+CREATE TABLE analisisFibraDietetica(
+    idanalisisFibraDietetica INT PRIMARY KEY AUTO_INCREMENT,
+    idAnalisis INT NOT NULL,
+    resultado NUMERIC(10,2) NOT NULL,
+    unidad VARCHAR(20) NOT NULL, 
+    metodoReferencia VARCHAR(100) NOT NULL,
+    acreditacion VARCHAR(10) NOT NULL,
+    CONSTRAINT fk_analisisFibraDietetica_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+);
+
+CREATE TABLE analisisSodio(
+    idanalisisSodio INT PRIMARY KEY AUTO_INCREMENT,
+    idAnalisis INT NOT NULL,
+    resultado NUMERIC(10,2) NOT NULL,
+    unidad VARCHAR(20) NOT NULL, 
+    metodoReferencia VARCHAR(100) NOT NULL,
+    acreditacion VARCHAR(10) NOT NULL,
+    CONSTRAINT fk_analisisSodio_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+);
+
+CREATE TABLE analisisEnergetico(
+    idAnalisisEnergetico INT PRIMARY KEY AUTO_INCREMENT,
+    idAnalisis INT NOT NULL,
+    resultadoKcal NUMERIC(10,2) NOT NULL,
+    resultadoKj NUMERIC(10,2) NOT NULL,
+    unidadKcal VARCHAR(20) NOT NULL,
+    unidadKj VARCHAR(20) NOT NULL,
+    metodoReferencia VARCHAR(100) NOT NULL,
+    acreditacion VARCHAR(10) NOT NULL,
+    CONSTRAINT fk_analisisEnergetico_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+);
+
+
+
+CREATE TABLE analisisAcidosGrasos(
+    idAnalisisAcidosGrasos INT PRIMARY KEY AUTO_INCREMENT,
+    idAnalisis INT NOT NULL,
+    resultado NUMERIC(10,2) NOT NULL,
     unidad VARCHAR(20) NOT NULL,
-    CONSTRAINT fk_analisis_muestra FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra),
-    CONSTRAINT fk_analisis_analista FOREIGN KEY (idAnalista) REFERENCES usuarios(idUsuario)
+    metodoReferencia VARCHAR(100) NOT NULL,
+    acreditacion VARCHAR(10) NOT NULL,
+    resultadoTrans NUMERIC(10,2) NOT NULL,
+    resultadoSaturadas NUMERIC(10,2) NOT NULL,
+    resultadoMonoinsaturados NUMERIC(10,2) NOT NULL,
+    resultadoPolyinsaturados NUMERIC(10,2) NOT NULL,
+    total NUMERIC(10,2) NOT NULL,
+    CONSTRAINT fk_analisisAcidosGrasos_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
 );
 
 CREATE TABLE historialPdf (
-    idHistorial INT PRIMARY KEY,
-    idMuestra INT NOT NULL,
+    idHistorial INT PRIMARY KEY AUTO_INCREMENT,
+    idAnalisis INT NOT NULL,
     idUsuario INT NOT NULL,
-    fechaGeneracion TIMESTAMP NOT NULL,
-    CONSTRAINT fk_historialPdf_muestra FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra),
-    CONSTRAINT fk_historialPdf_usuario FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario)
+    fechaGeneracion TIMESTAMP NOT NULL
 );
-
