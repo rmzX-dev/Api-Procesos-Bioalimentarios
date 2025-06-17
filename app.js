@@ -6,6 +6,7 @@ import clientRoutes from "./routes/clientRoutes.js";
 import sampleRoutes from "./routes/sampleRoutes.js";
 import analysisRoutes from "./routes/analysisRoutes.js";
 import swaggerDocs from "./config/swagger.js";
+import excelRoutes from "./routes/excelRoutes.js";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use("/api", userRoutes);
 app.use("/api", clientRoutes);
 app.use("/api", sampleRoutes);
 app.use("/api", analysisRoutes);
+app.use("/api", excelRoutes);
 
 
 const PORT = process.env.PORT || 3000;
