@@ -12,6 +12,14 @@ class Proteins{
 
         return result.rows[0];
     }
+
+    static async getProteinsById(idAnalisis){
+        const result = await pool.query(
+            'SELECT * FROM analisis_proteinas WHERE idAnalisis = $1',
+            [idAnalisis]
+        );
+        return result.rows[0];
+    }
 }
 
 export default Proteins;
