@@ -12,6 +12,14 @@ class Mouisture {
 
         return result.rows[0];
     }
+
+    static async getMoistureById(idAnalisis){
+        const result = await pool.query(
+            'SELECT * FROM analisis_humedad WHERE idAnalisis = $1',
+            [idAnalisis]
+        );
+        return result.rows[0];
+    }
 }
 
 
