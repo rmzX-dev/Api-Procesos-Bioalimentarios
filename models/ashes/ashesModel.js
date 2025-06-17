@@ -12,6 +12,15 @@ class Ashes{
 
         return result.rows[0];
     }
+
+
+    static async getAshesById(idAnalisis){
+        const result = await pool.query(
+            'SELECT * FROM analisis_cenizas WHERE idAnalisis = $1',
+            [idAnalisis]
+        );
+        return result.rows[0];
+    }
 }
 
 export default Ashes;
