@@ -20,6 +20,13 @@ class Mouisture {
         );
         return result.rows[0];
     }
+
+    static async getAllMoisture(){
+        const result = await pool.query(
+            'SELECT * FROM analisis_humedad'
+        )
+        return result.rows;
+    }
 }
 
 

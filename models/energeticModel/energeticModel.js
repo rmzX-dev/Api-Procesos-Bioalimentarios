@@ -29,6 +29,12 @@ class Energetic {
         );
         return result.rows[0];
     }
+
+    static async getAllEnergetico(){
+        const result = await pool.query(
+            'SELECT * FROM analisis_energetico'
+        )
+    }
 }
 
 export default Energetic;

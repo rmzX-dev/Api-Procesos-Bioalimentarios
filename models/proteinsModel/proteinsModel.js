@@ -20,6 +20,13 @@ class Proteins{
         );
         return result.rows[0];
     }
+
+    static async getAllProteins(){
+        const result = await pool.query(
+            'SELECT * FROM analisis_proteinas'
+        );
+        return result.rows;
+    }
 }
 
 export default Proteins;

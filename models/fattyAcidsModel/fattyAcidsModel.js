@@ -38,6 +38,13 @@ class FattyAcids {
         );
         return result.rows[0];
     }
+
+    static async getAllAcidos(){
+        const result = await pool.query(
+            'SELECT * FROM analisis_acidos_grasos'
+        );
+        return result.rows;
+    }
 }
 
 export default FattyAcids;

@@ -20,6 +20,13 @@ class Sodium {
         );
         return result.rows[0];
     }
+
+    static async getAllSodium() {
+        const result = await pool.query(
+            'SELECT * FROM analisis_sodio'
+        );
+        return result.rows;
+    }
 }
 
 export default Sodium;

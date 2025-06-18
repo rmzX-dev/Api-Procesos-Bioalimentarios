@@ -20,6 +20,12 @@ class Carbohydrates {
         );
         return result.rows[0];
     }
+
+    static async getAllCarbs(){
+        const result = await pool.query(
+            'SELECT * FROM analisis_carbohidratos'
+        )
+    }
 }
 
 export default Carbohydrates;

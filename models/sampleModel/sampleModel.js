@@ -14,7 +14,7 @@ class Muestra {
     return result.rows[0];
   }
 
-  static async create(data) {
+  static async createSample(data) {
     const {
       idCliente,
       folio,
@@ -38,46 +38,10 @@ class Muestra {
         temperatura,
       ]
     );
-
     return result.rows[0];
   }
 
-  static async update(idMuestra, data) {
-    const {
-      idCliente,
-      folio,
-      descripcion,
-      fechaMuestreo,
-      fechaRecepcion,
-      temperatura,
-    } = data;
 
-    const result = await pool.query(
-      `UPDATE muestra SET 
-        idCliente = $1, folio = $2, descripcion = $3,
-        fechaMuestreo = $4, fechaRecepcion = $5, temperatura = $6
-      WHERE idMuestra = $7 RETURNING *`,
-      [
-        idCliente,
-        folio,
-        descripcion,
-        fechaMuestreo,
-        fechaRecepcion,
-        temperatura,
-        idMuestra,
-      ]
-    );
-
-    return result.rows[0];
-  }
-
-  static async delete(idMuestra) {
-    const result = await pool.query(
-      "DELETE FROM muestra WHERE idMuestra = $1 RETURNING *",
-      [idMuestra]
-    );
-    return result.rows[0];
-  }
 }
 
 export default Muestra;

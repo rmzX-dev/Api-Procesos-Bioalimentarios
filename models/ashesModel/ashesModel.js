@@ -21,6 +21,13 @@ class Ashes{
         );
         return result.rows[0];
     }
+
+    static async getAllAshes () {
+        const result = await pool.query(
+            'SELECT * FROM analisis_cenizas'
+        );
+        return result.rows;
+    }
 }
 
 export default Ashes;

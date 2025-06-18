@@ -20,6 +20,12 @@ class DietaryFiber {
         );
         return result.rows[0];
     }
+
+    static async getAllFibra(){
+        const result = await pool.query(
+            'SELECT * FROM analisis_fibra_dietetica'
+        )
+    }
 }
 
 export default DietaryFiber;
