@@ -3,7 +3,6 @@ CREATE TABLE usuarios (
     nombre VARCHAR(40) NOT NULL,
     apellidoPaterno VARCHAR(40) NOT NULL,
     apellidoMaterno VARCHAR(40),
-    fechaNacimiento DATE NOT NULL,
     correo VARCHAR(50) NOT NULL,
     contrasenia VARCHAR(255) NOT NULL,
     telefono VARCHAR(20) NOT NULL
@@ -89,6 +88,16 @@ CREATE TABLE analisisSodio(
     CONSTRAINT fk_analisisSodio_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
 );
 
+CREATE TABLE analisisCarbohidratos(
+    idanalisisCarbohidratos INT PRIMARY KEY AUTO_INCREMENT,
+    idAnalisis INT NOT NULL,
+    resultado NUMERIC(10,2) NOT NULL,
+    unidad VARCHAR(20) NOT NULL, 
+    metodoReferencia VARCHAR(100) NOT NULL,
+    acreditacion VARCHAR(10) NOT NULL,
+    CONSTRAINT fk_analisisSodio_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+);
+
 CREATE TABLE analisisEnergetico(
     idAnalisisEnergetico INT PRIMARY KEY AUTO_INCREMENT,
     idAnalisis INT NOT NULL,
@@ -118,9 +127,23 @@ CREATE TABLE analisisAcidosGrasos(
     CONSTRAINT fk_analisisAcidosGrasos_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
 );
 
-CREATE TABLE historialPdf (
+CREATE TABLE folav (
     idHistorial INT PRIMARY KEY AUTO_INCREMENT,
     idAnalisis INT NOT NULL,
     idUsuario INT NOT NULL,
-    fechaGeneracion TIMESTAMP NOT NULL
+    fechaGeneracion TIMESTAMP NOT NULL,
+    CONSTRAINT fk_folav_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+    CONSTRAINT fk_folav_usuario FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario)
 );
+
+CREATE TABLE contenidoNutrimental(
+    idContenidoNutrimental INT PRIMARY KEY AUTO_INCREMENT,
+    idMuestra INT NOT NULL,
+    idAnalisis INT NOT NULL,
+    idFolav INT NOT NULL,
+    idUsuario INT NOT NULL,
+    CONSTRAINT fk_contenidoNutrimental_muestra FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra),
+    CONSTRAINT fk_contenidoNutrimental_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis),
+    CONSTRAINT fk_contenidoNutrimental_folav FOREIGN KEY (idFolav) REFERENCES folav(idFolav),
+    CONSTRAINT fk_contenidoNutrimental_usuario FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario)
+)
