@@ -1,4 +1,4 @@
-import Analisis from "../models/analysisModel.js";
+import Analisis from "../../models/analysisModel/analysisModel.js";
 
 class AnalisisController {
   static async getAll(req, res) {

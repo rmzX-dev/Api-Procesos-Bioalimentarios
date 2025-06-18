@@ -1,4 +1,4 @@
-import pool from "../config/db.js";
+import pool from "../../config/db.js";
 
 class Analisis {
   static async getAllAnalisis() {
@@ -15,21 +15,21 @@ class Analisis {
   }
 
   static async createAnalisis(data) {
-    const { idMuestra, idAnalista, tipoAnalisis, resultado, unidad } = data;
+    const { idMuestra, tipo } = data;
     const result = await pool.query(
-      `INSERT INTO analisis (idMuestra, idAnalista, tipoAnalisis, resultado, unidad)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [idMuestra, idAnalista, tipoAnalisis, resultado, unidad]
+      `INSERT INTO analisis (idMuestra, tipo)
+       VALUES ($1, $2) RETURNING *`,
+      [idMuestra, tipo]
     );
     return result.rows[0];
   }
 
   static async updateAnalisis(id, data) {
-    const { idMuestra, idAnalista, tipoAnalisis, resultado, unidad } = data;
+    const { idMuestra, tipo } = data;
     const result = await pool.query(
-      `UPDATE analisis SET idMuestra = $1, idAnalista = $2, tipoAnalisis = $3,
-       resultado = $4, unidad = $5 WHERE idAnalisis = $6 RETURNING *`,
-      [idMuestra, idAnalista, tipoAnalisis, resultado, unidad, id]
+      `UPDATE analisis SET idMuestra = $1, tipo = $2
+       WHERE idAnalisis = $3 RETURNING *`,
+      [idMuestra, tipo, id]
     );
     return result.rows[0];
   }

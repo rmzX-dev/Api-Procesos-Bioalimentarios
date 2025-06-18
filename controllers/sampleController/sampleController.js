@@ -1,4 +1,4 @@
-import Muestra from "../models/sampleModel.js";
+import Muestra from "../../models/sampleModel/sampleModel.js";
 
 class MuestraController {
   static async getAll(req, res) {

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import AnalisisController from '../controllers/analysisController.js';
+import AnalisisController from '../../controllers/analysisController/analysisController.js';
 
 const router = Router();
 
@@ -16,9 +16,6 @@ const router = Router();
  *   get:
  *     summary: Obtener todos los análisis
  *     tags: [Analisis]
- *     responses:
- *       200:
- *         description: Lista de análisis
  */
 router.get('/analisis', AnalisisController.getAll);
 
@@ -32,14 +29,8 @@ router.get('/analisis', AnalisisController.getAll);
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID del análisis
  *         schema:
  *           type: integer
- *     responses:
- *       200:
- *         description: Análisis encontrado
- *       404:
- *         description: No encontrado
  */
 router.get('/analisis/:id', AnalisisController.getById);
 
@@ -57,24 +48,12 @@ router.get('/analisis/:id', AnalisisController.getById);
  *             type: object
  *             required:
  *               - idMuestra
- *               - idAnalista
- *               - tipoAnalisis
- *               - resultado
- *               - unidad
+ *               - tipo
  *             properties:
  *               idMuestra:
  *                 type: integer
- *               idAnalista:
- *                 type: integer
- *               tipoAnalisis:
+ *               tipo:
  *                 type: string
- *               resultado:
- *                 type: number
- *               unidad:
- *                 type: string
- *     responses:
- *       201:
- *         description: Análisis creado exitosamente
  */
 router.post('/analisis', AnalisisController.create);
 
@@ -88,7 +67,6 @@ router.post('/analisis', AnalisisController.create);
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID del análisis
  *         schema:
  *           type: integer
  *     requestBody:
@@ -100,19 +78,8 @@ router.post('/analisis', AnalisisController.create);
  *             properties:
  *               idMuestra:
  *                 type: integer
- *               idAnalista:
- *                 type: integer
- *               tipoAnalisis:
+ *               tipo:
  *                 type: string
- *               resultado:
- *                 type: number
- *               unidad:
- *                 type: string
- *     responses:
- *       200:
- *         description: Análisis actualizado
- *       404:
- *         description: No encontrado
  */
 router.put('/analisis/:id', AnalisisController.update);
 
@@ -128,11 +95,6 @@ router.put('/analisis/:id', AnalisisController.update);
  *         required: true
  *         schema:
  *           type: integer
- *     responses:
- *       200:
- *         description: Análisis eliminado
- *       404:
- *         description: No encontrado
  */
 router.delete('/analisis/:id', AnalisisController.delete);
 
