@@ -38,39 +38,6 @@ class ClienteController {
       res.status(500).json({ message: 'Error al crear el cliente' });
     }
   }
-
-  static async updateCliente(req, res) {
-    try {
-      const { id } = req.params;
-      const data = req.body;
-      const clienteActualizado = await Cliente.updateCliente(id, data);
-
-      if (!clienteActualizado) {
-        return res.status(404).json({ message: 'Cliente no encontrado' });
-      }
-
-      res.status(200).json(clienteActualizado);
-    } catch (error) {
-      console.error('Error al actualizar cliente:', error);
-      res.status(500).json({ message: 'Error al actualizar el cliente' });
-    }
-  }
-
-  static async deleteCliente(req, res) {
-    try {
-      const { id } = req.params;
-      const clienteEliminado = await Cliente.deleteCliente(id);
-
-      if (!clienteEliminado) {
-        return res.status(404).json({ message: 'Cliente no encontrado' });
-      }
-
-      res.status(200).json({ message: 'Cliente eliminado correctamente' });
-    } catch (error) {
-      console.error('Error al eliminar cliente:', error);
-      res.status(500).json({ message: 'Error al eliminar el cliente' });
-    }
-  }
 }
 
 export default ClienteController;
