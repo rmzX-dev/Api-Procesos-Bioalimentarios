@@ -1,12 +1,12 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import userRoutes from "./routes/userRoutes.js";
-import clientRoutes from "./routes/clientRoutes.js";
-import sampleRoutes from "./routes/sampleRoutes.js";
-import analysisRoutes from "./routes/analysisRoutes.js";
+import userRoutes from "./routes/userRoutes/userRoutes.js";
+import clientRoutes from "./routes/clientRoutes/clientRoutes.js";
+import sampleRoutes from "./routes/sampleRoutes/sampleRoutes.js";
+import analysisRoutes from "./routes/analysisRoutes/analysisRoutes.js";
+import excelRoutes from "./routes/excelRoutes/excelRoutes.js";
 import swaggerDocs from "./config/swagger.js";
-import excelRoutes from "./routes/excelRoutes.js";
 
 dotenv.config();
 
