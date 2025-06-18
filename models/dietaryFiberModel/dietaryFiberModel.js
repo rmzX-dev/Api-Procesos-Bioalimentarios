@@ -24,7 +24,8 @@ class DietaryFiber {
     static async getAllFibra(){
         const result = await pool.query(
             'SELECT * FROM analisis_fibra_dietetica'
-        )
+        );
+        return result.rows();
     }
 }
 

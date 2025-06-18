@@ -24,7 +24,8 @@ class Carbohydrates {
     static async getAllCarbs(){
         const result = await pool.query(
             'SELECT * FROM analisis_carbohidratos'
-        )
+        );
+        return result.rows;
     }
 }
 

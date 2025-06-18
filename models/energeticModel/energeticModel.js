@@ -1,7 +1,7 @@
 import pool from "../../config/db";
 
 class Energetic {
-    static async createAnalisisEnergetico(data) {
+    static async createEnergetic(data) {
         const {
             idAnalisis,
             resultadoKcal,
@@ -22,7 +22,7 @@ class Energetic {
         return result.rows[0];
     }
 
-    static async getEnergeticoById(idAnalisis) {
+    static async getEnergeticById(idAnalisis) {
         const result = await pool.query(
             'SELECT * FROM analisis_energetico WHERE idAnalisis = $1',
             [idAnalisis]
@@ -30,10 +30,11 @@ class Energetic {
         return result.rows[0];
     }
 
-    static async getAllEnergetico(){
+    static async getAllEnergetic(){
         const result = await pool.query(
             'SELECT * FROM analisis_energetico'
-        )
+        );
+        return result.rows;
     }
 }
 
