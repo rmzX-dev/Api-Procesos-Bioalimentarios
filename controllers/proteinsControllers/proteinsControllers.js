@@ -1,4 +1,4 @@
-import Proteins from "../../models/proteinsModel/proteinsModel";
+import Proteins from "../../models/proteinsModel/proteinsModel.js";
 class proteinsController {
   static async getAllProteins(req, res) {
     try {
