@@ -23,19 +23,17 @@ class User {
       nombre,
       apellidoPaterno,
       apellidoMaterno,
-      fechaNacimiento,
       correo,
       contrasenia,
       telefono,
     } = data;
     const hashedPassword = await bcrypt.hash(contrasenia, SALT_ROUNDS);
     const result = await pool.query(
-      "INSERT INTO usuarios (nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia, telefono) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;",
+      "INSERT INTO usuarios (nombre, apellidoPaterno, apellidoMaterno, correo, contrasenia, telefono) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
       [
         nombre,
         apellidoPaterno,
         apellidoMaterno,
-        fechaNacimiento,
         correo,
         hashedPassword,
         telefono,
