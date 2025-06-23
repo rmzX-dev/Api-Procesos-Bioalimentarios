@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import carbohydratesController from '../../controllers/carbodydratesController/carbodydratesController';
+import carbohydratesController from '../../controllers/carbodydratesController/carbodydratesController.js';
 const router = Router();
 
 router.get('/carbohydrates', carbohydratesController.getAllCarbs);
