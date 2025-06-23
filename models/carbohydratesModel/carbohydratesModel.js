@@ -1,4 +1,4 @@
-import pool from "../../config/db"; 
+import pool from "../../config/db.js"; 
 
 class Carbohydrates {
     static async createAnalisisCarbs(data) {
