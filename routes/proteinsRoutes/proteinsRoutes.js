@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import proteinsController from '../../controllers/proteinsControllers/proteinsControllers';
+import proteinsController from '../../controllers/proteinsControllers/proteinsControllers.js';
 const router = Router();
 
 router.get('/proteins', proteinsController.getAllProteins);

@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import AnalisisController from '../../controllers/analysisController/analysisController';
+//import AnalisisController from '../../controllers/analysisController/analysisController';
+import AnalisisController  from '../../controllers/analysisController/analysisController.js';
 
 const router = Router();
 

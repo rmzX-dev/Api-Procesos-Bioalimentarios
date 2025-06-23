@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import energeticController from '../../controllers/energeticController/energeticController';
+import energeticController from '../../controllers/energeticController/energeticController.js';
 const router = Router();
 
 router.get('/energetic', energeticController.getAllEnergetic);

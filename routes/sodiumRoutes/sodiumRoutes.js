@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import sodiumController from '../../controllers/sodiumController/sodiumController';
+import sodiumController from '../../controllers/sodiumController/sodiumController.js';
 const router = Router();
 
 router.get('/sodium', sodiumController.getAllSodium);

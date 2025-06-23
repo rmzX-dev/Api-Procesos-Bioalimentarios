@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import mouistureController from '../../controllers/moistureControllers/moistureControllers';
+import mouistureController from '../../controllers/moistureControllers/moistureControllers.js';
 const router = Router();
 
 router.get('/mouisture', mouistureController.getAllMouisture);

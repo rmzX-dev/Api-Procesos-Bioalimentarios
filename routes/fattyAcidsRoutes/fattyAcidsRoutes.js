@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import fattyAcidsController from '../../controllers/fattyAcidsControllers/fattyAcidsControllers';
+import fattyAcidsController from '../../controllers/fattyAcidsControllers/fattyAcidsControllers.js';
 const router = Router();
 
 router.get('/fattyAcids', fattyAcidsController.getAllAcids);

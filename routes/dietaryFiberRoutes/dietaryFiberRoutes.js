@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import dietaryFiberController from '../../controllers/dietaryController/dietaryController';
+import dietaryFiberController from '../../controllers/dietaryController/dietaryController.js';
 const router = Router();
 
 router.get('/dietaryFiber', dietaryFiberController.getAllFiber);

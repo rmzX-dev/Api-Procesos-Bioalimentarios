@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import AshesController from '../../controllers/ashesController/ashesController';
+import AshesController from '../../controllers/ashesController/ashesController.js';
 const router = Router();
 
 router.get('/ashes', AshesController.getAllAshes);
