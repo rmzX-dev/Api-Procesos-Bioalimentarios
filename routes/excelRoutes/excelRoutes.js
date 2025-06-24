@@ -39,7 +39,7 @@ const router = express.Router();
  */
 router.post(
   '/excel/upload',
-  upload.array('archivos', 6), // permite subir hasta 6 archivos Excel
+  upload.array('archivos', 7), // permite subir hasta 6 archivos Excel
   ExcelController.procesarMultiplesArchivos
 );
 
