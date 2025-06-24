@@ -43,18 +43,16 @@ class ExcelController {
       }
 
 
-
-
+      //CENIZAS
       /**
  * @param {Buffer} buffer
- * @returns {{folio: string|number, muestra: string|null, proteina: string|number|null}}
+ * @returns {{ folio: string|number|null, muestra: string|null, cenizasPromedio: string|number|null }}
  */
-      function parseProteinBuffer(buffer) {
+      function parseAshBuffer(buffer) {
         const wb = xlsx.read(buffer, { type: "buffer" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
         const rows = xlsx.utils.sheet_to_json(sheet, { header: 1, defval: null });
 
-        // 1) Normaliza cadenas quitando tildes y forzando mayúsculas
         const normalize = str =>
           (str || "")
             .toString()
@@ -63,35 +61,78 @@ class ExcelController {
             .toUpperCase()
             .trim();
 
-        // 2) Busca la fila de encabezados que incluya "FOLIO" y "PROTEINA"
+        // 1) Encuentra la fila de encabezado con “PROMEDIO” y “CENIZAS”
         const headerIdx = rows.findIndex(row => {
           const norm = row.map(normalize);
-          return norm.includes("FOLIO") && norm.some(h => h.includes("PROTEINA"));
+          return norm.some(h => h.includes("PROMEDIO")) && norm.some(h => h.includes("CENIZAS"));
         });
         if (headerIdx === -1) {
-          throw new Error("No se encontró la fila de encabezados de Proteína");
+          throw new Error("No se encontró encabezado de Promedio de Cenizas");
         }
 
-        // 3) Mapea columnas por inclusión
+        // 2) Obtén los índices de columna
         const header = rows[headerIdx].map(normalize);
+        const promCol = header.findIndex(h => h.includes("PROMEDIO") && h.includes("CENIZAS"));
         const folioCol = header.findIndex(h => h.includes("FOLIO"));
         const muestraCol = header.findIndex(h => h.includes("MUESTRA"));
-        const protCol = header.findIndex(h => h.includes("PROTEINA"));
 
-        if (folioCol < 0 || protCol < 0) {
-          throw new Error("No se pudieron mapear las columnas de Proteína");
+        if (promCol < 0) {
+          throw new Error("No se pudo mapear la columna de Promedio de Cenizas");
         }
 
-        // 4) Toma la fila inmediatamente siguiente al encabezado
-        const dataRow = rows[headerIdx + 1];
-        if (!dataRow) {
-          throw new Error("No hay datos debajo del encabezado de Proteína");
+        // 3) Lee la fila de datos justo debajo del encabezado
+        const dataRow = rows[headerIdx + 1] || [];
+        return {
+          folio: folioCol >= 0 ? dataRow[folioCol] : null,
+          muestra: muestraCol >= 0 ? dataRow[muestraCol] : null,
+          cenizasPromedio: dataRow[promCol] ?? null
+        };
+      }
+
+      //PROTEINAS
+      /**
+ * @param {Buffer} buffer
+ * @returns {{ folio: string|number|null, muestra: string|null, proteina: string|number|null }}
+ */
+      function parseProteinBuffer(buffer) {
+        const wb = xlsx.read(buffer, { type: "buffer" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = xlsx.utils.sheet_to_json(sheet, { header: 1, defval: null });
+
+        const normalize = str =>
+          (str || "")
+            .toString()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase()
+            .trim();
+
+        // 1) Encontrar la fila de encabezado que tenga "%PROTEINA"
+        const headerIdx = rows.findIndex(row =>
+          row.some(cell => normalize(cell).includes("%PROTEINA"))
+        );
+        if (headerIdx === -1) {
+          throw new Error("No se encontró la fila de encabezado '%Proteína'");
         }
+
+        // 2) Mapear índices de columnas clave
+        const header = rows[headerIdx].map(normalize);
+        const protCol = header.findIndex(h => h.includes("%PROTEINA"));
+        // buscamos FOLIO o IDENTIFICACION
+        const folioCol = header.findIndex(h => h.includes("FOLIO") || h.includes("IDENTIFICACION"));
+        const muestraCol = header.findIndex(h => h.includes("MUESTRA"));
+
+        if (protCol < 0) {
+          throw new Error("No se pudo mapear la columna '%Proteína'");
+        }
+
+        // 3) Leer la fila de datos justo debajo
+        const dataRow = rows[headerIdx + 1] || [];
 
         return {
-          folio: dataRow[folioCol],
+          folio: folioCol >= 0 ? dataRow[folioCol] : null,
           muestra: muestraCol >= 0 ? dataRow[muestraCol] : null,
-          proteina: dataRow[protCol] || null
+          proteina: dataRow[protCol] ?? null
         };
       }
 
@@ -288,6 +329,72 @@ class ExcelController {
         return { error: `Folio ${targetFolio} no encontrado en Sodio` };
       }
 
+      //CONTENIDO ENERGETICO Y CARBHOIDRATOS
+      /**
+ * @param {Buffer} buffer
+ * @returns {{
+ *   folio: string|number|null,
+ *   muestra: string|null,
+ *   carbohidratos: string|number|null,
+ *   energiaKcal:    string|number|null,
+ *   energiaKJ:      string|number|null
+ * }}
+ */
+      function parseCarbsAndEnergy(buffer) {
+        const wb = xlsx.read(buffer, { type: "buffer" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = xlsx.utils.sheet_to_json(sheet, { header: 1, defval: null });
+
+        const normalize = str =>
+          (str || "")
+            .toString()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase()
+            .trim();
+
+        // — 1) Carbohidratos: misma lógica que antes —
+        const carbIdx = rows.findIndex(r =>
+          r.some(c => normalize(c).includes("CARBOHIDRATOS"))
+        );
+        if (carbIdx === -1) {
+          throw new Error("No se encontró encabezado de Carbohidratos");
+        }
+        const carbHeader = rows[carbIdx].map(normalize);
+        const folioCol = carbHeader.findIndex(h => h.includes("FOLIO"));
+        const muestraCol = carbHeader.findIndex(h => h.includes("MUESTRA"));
+        const carbCol = carbHeader.findIndex(h => h.includes("CARBOHIDRATOS"));
+        const carbRow = rows[carbIdx + 1] || [];
+
+        const folio = folioCol >= 0 ? carbRow[folioCol] : null;
+        const muestra = muestraCol >= 0 ? carbRow[muestraCol] : null;
+        const carbohidratos = carbRow[carbCol] ?? null;
+
+        // — 2) Energía: buscar por “KCAL” y “KJ” en la misma fila —
+        let energiaKcal = null, energiaKJ = null;
+        try {
+          const energyIdx = rows.findIndex(r => {
+            const norm = r.map(normalize);
+            return norm.some(h => h.includes("KCAL")) && norm.some(h => h.includes("KJ"));
+          });
+          if (energyIdx !== -1) {
+            const energyHeader = rows[energyIdx].map(normalize);
+            const kcalCol = energyHeader.findIndex(h => h.includes("KCAL"));
+            const kjCol = energyHeader.findIndex(h => h.includes("KJ"));
+            const energyRow = rows[energyIdx + 1] || [];
+            energiaKcal = energyRow[kcalCol] ?? null;
+            energiaKJ = energyRow[kjCol] ?? null;
+          }
+        } catch {
+          // si algo falla, dejamos los valores en null
+        }
+
+        return { folio, muestra, carbohidratos, energiaKcal, energiaKJ };
+      }
+
+
+
+
       // ── 1) Extraer folio de Humedad ────────────────────────
       let targetFolio;
       for (const { buffer } of archivos) {
@@ -321,16 +428,39 @@ class ExcelController {
           .flat()
           .map(c => (c || "").toString().toUpperCase());
 
+        // Procesar carbohidratos + energía _antes_ de proteína:
+        if (
+          originalname.toUpperCase().includes("CARBOHIDRATOS") ||
+          flat.some(cell => cell.includes("CARBOHIDRATOS"))
+        ) {
+          const { folio, muestra, carbohidratos, energiaKcal, energiaKJ } =
+            parseCarbsAndEnergy(buffer);
+          return { nombre: originalname, folio, muestra, carbohidratos, energiaKcal, energiaKJ };
+        }
+
+
         if (flat.some(cell => cell.includes("PROMEDIO DE % HUMEDAD"))) {
           return { nombre: originalname, ...parseHumidityBuffer(buffer) };
         }
+
         if (
-          // detecta proteína por nombre de archivo o porque en su contenido aparezca "PROTEINA"
           originalname.toUpperCase().includes("PROTEINA") ||
           flat.some(cell => cell.includes("PROTEINA"))
         ) {
-          return { nombre: originalname, ...parseProteinBuffer(buffer) };
+          const { folio, muestra, proteina } = parseProteinBuffer(buffer);
+          return { nombre: originalname, folio, muestra, proteina };
         }
+
+        // procesar Cenizas8/
+        if (
+          originalname.toUpperCase().includes("CENIZAS") ||
+          flat.some(cell => cell.includes("CENIZAS"))
+        ) {
+          const { cenizasPromedio } = parseAshBuffer(buffer);
+          return { nombre: originalname, cenizasPromedio };
+        }
+
+
         if (flat.some(cell =>
           cell.includes("FIBRA")
         )
@@ -349,6 +479,7 @@ class ExcelController {
         if (flat.some(cell => cell.includes("SODIO")) || flat.some(cell => cell.includes("100G"))) {
           return { nombre: originalname, ...parseSodiumBuffer(buffer, targetFolio) };
         }
+
         return { nombre: originalname, error: "Formato no soportado" };
       });
 
