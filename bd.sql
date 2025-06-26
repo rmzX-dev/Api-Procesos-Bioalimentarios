@@ -1,15 +1,27 @@
+-- Script de Base de Datos para API de Procesos Bioalimentarios
+-- Base de datos: estadias
+-- Compatible con PostgreSQL
+
+-- Crear la base de datos (ejecutar como superusuario)
+-- CREATE DATABASE estadias;
+
+-- Conectar a la base de datos
+-- \c estadias;
+
+-- Tabla de Usuarios
 CREATE TABLE usuarios (
-    idUsuario INT PRIMARY KEY AUTO_INCREMENT,
+    idUsuario SERIAL PRIMARY KEY,
     nombre VARCHAR(40) NOT NULL,
     apellidoPaterno VARCHAR(40) NOT NULL,
     apellidoMaterno VARCHAR(40),
-    correo VARCHAR(50) NOT NULL,
+    correo VARCHAR(50) UNIQUE NOT NULL,
     contrasenia VARCHAR(255) NOT NULL,
-    telefono VARCHAR(20) NOT NULL
+    telefono VARCHAR(20)
 );
 
+-- Tabla de Clientes
 CREATE TABLE clientes (
-    idCliente INT PRIMARY KEY AUTO_INCREMENT,
+    idCliente SERIAL PRIMARY KEY,
     nombre VARCHAR(40) NOT NULL,
     apellidoPaterno VARCHAR(40) NOT NULL,
     apellidoMaterno VARCHAR(40),
@@ -20,130 +32,148 @@ CREATE TABLE clientes (
     acreditacion VARCHAR(255) NOT NULL
 );
 
+-- Tabla de Muestras
 CREATE TABLE muestra (
-    idMuestra INT PRIMARY KEY AUTO_INCREMENT,
-    idCliente INT NOT NULL,
-    folio VARCHAR(20) UNIQUE NOT NULL,
-    descripcion TEXT NOT NULL,
+    idMuestra SERIAL PRIMARY KEY,
+    idCliente INTEGER NOT NULL,
+    folio VARCHAR(20) NOT NULL,
+    descripcion TEXT,
     fechaMuestreo DATE NOT NULL,
     fechaRecepcion DATE NOT NULL,
-    temperatura DECIMAL(5,2) NOT NULL,
-    CONSTRAINT fk_muestra_cliente FOREIGN KEY (idCliente) REFERENCES clientes(idCliente)
+    temperatura DECIMAL(5,2),
+    FOREIGN KEY (idCliente) REFERENCES clientes(idCliente) ON DELETE CASCADE
 );
 
+-- Tabla de Análisis
 CREATE TABLE analisis (
-    idAnalisis INT PRIMARY KEY AUTO_INCREMENT,
-    idMuestra INT NOT NULL,
+    idAnalisis SERIAL PRIMARY KEY,
+    idMuestra INTEGER NOT NULL,
     tipo VARCHAR(50) NOT NULL,
-    CONSTRAINT fk_analisis_muestra FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra)
+    FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra) ON DELETE CASCADE
 );
 
-CREATE TABLE analisisProteinas(
-    idAnalisisProteinas INT PRIMARY KEY AUTO_INCREMENT,
-    idAnalisis INT NOT NULL,
-    resultado NUMERIC(10,2) NOT NULL,
-    unidad VARCHAR(20) NOT NULL, 
+-- Tabla de Análisis de Proteínas
+CREATE TABLE analisisproteinas (
+    idAnalisisProteinas SERIAL PRIMARY KEY,
+    idAnalisis INTEGER NOT NULL,
+    resultado DECIMAL(10,4) NOT NULL,
+    unidad VARCHAR(20) NOT NULL,
     metodoReferencia VARCHAR(100) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
-    CONSTRAINT fk_analisisProteinas_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
 
-CREATE TABLE analisisCenizas(
-    idAnalisisCenizas INT PRIMARY KEY AUTO_INCREMENT,
-    idAnalisis INT NOT NULL,
-    resultado NUMERIC(10,2) NOT NULL,
-    unidad VARCHAR(20) NOT NULL, 
+-- Tabla de Análisis de Cenizas
+CREATE TABLE analisiscenizas (
+    idAnalisisCenizas SERIAL PRIMARY KEY,
+    idAnalisis INTEGER NOT NULL,
+    resultado DECIMAL(10,4) NOT NULL,
+    unidad VARCHAR(20) NOT NULL,
     metodoReferencia VARCHAR(100) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
-    CONSTRAINT fk_analisisCenizas_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
 
-CREATE TABLE analisisHumedad(
-    idAnalisisHumedad INT PRIMARY KEY AUTO_INCREMENT,
-    idAnalisis INT NOT NULL,
-    resultado NUMERIC(10,2) NOT NULL,
-    unidad VARCHAR(20) NOT NULL, 
+-- Tabla de Análisis de Humedad
+CREATE TABLE analisishumedad (
+    idAnalisisHumedad SERIAL PRIMARY KEY,
+    idAnalisis INTEGER NOT NULL,
+    resultado DECIMAL(10,4) NOT NULL,
+    unidad VARCHAR(20) NOT NULL,
     metodoReferencia VARCHAR(100) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
-    CONSTRAINT fk_analisisHumedad_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
 
-CREATE TABLE analisisFibraDietetica(
-    idanalisisFibraDietetica INT PRIMARY KEY AUTO_INCREMENT,
-    idAnalisis INT NOT NULL,
-    resultado NUMERIC(10,2) NOT NULL,
-    unidad VARCHAR(20) NOT NULL, 
+-- Tabla de Análisis de Fibra Dietética
+CREATE TABLE analisisfibradietetica (
+    idanalisisFibraDietetica SERIAL PRIMARY KEY,
+    idAnalisis INTEGER NOT NULL,
+    resultado DECIMAL(10,4) NOT NULL,
+    unidad VARCHAR(20) NOT NULL,
     metodoReferencia VARCHAR(100) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
-    CONSTRAINT fk_analisisFibraDietetica_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
 
-CREATE TABLE analisisSodio(
-    idanalisisSodio INT PRIMARY KEY AUTO_INCREMENT,
-    idAnalisis INT NOT NULL,
-    resultado NUMERIC(10,2) NOT NULL,
-    unidad VARCHAR(20) NOT NULL, 
+-- Tabla de Análisis de Carbohidratos
+CREATE TABLE analisiscarbohidratos (
+    idAnalisisCarbohidratos SERIAL PRIMARY KEY,
+    idAnalisis INTEGER NOT NULL,
+    resultado DECIMAL(10,4) NOT NULL,
+    unidad VARCHAR(20) NOT NULL,
     metodoReferencia VARCHAR(100) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
-    CONSTRAINT fk_analisisSodio_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
 
-CREATE TABLE analisisCarbohidratos(
-    idanalisisCarbohidratos INT PRIMARY KEY AUTO_INCREMENT,
-    idAnalisis INT NOT NULL,
-    resultado NUMERIC(10,2) NOT NULL,
-    unidad VARCHAR(20) NOT NULL, 
+-- Tabla de Análisis de Sodio
+CREATE TABLE analisissodio (
+    idAnalisisSodio SERIAL PRIMARY KEY,
+    idAnalisis INTEGER NOT NULL,
+    resultado DECIMAL(10,4) NOT NULL,
+    unidad VARCHAR(20) NOT NULL,
     metodoReferencia VARCHAR(100) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
-    CONSTRAINT fk_analisisSodio_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
 
-CREATE TABLE analisisEnergetico(
-    idAnalisisEnergetico INT PRIMARY KEY AUTO_INCREMENT,
-    idAnalisis INT NOT NULL,
-    resultadoKcal NUMERIC(10,2) NOT NULL,
-    resultadoKj NUMERIC(10,2) NOT NULL,
+-- Tabla de Análisis Energético
+CREATE TABLE analisisenergetico (
+    idAnalisisEnergetico SERIAL PRIMARY KEY,
+    idAnalisis INTEGER NOT NULL,
+    resultadoKcal DECIMAL(10,4) NOT NULL,
+    resultadoKj DECIMAL(10,4) NOT NULL,
     unidadKcal VARCHAR(20) NOT NULL,
     unidadKj VARCHAR(20) NOT NULL,
     metodoReferencia VARCHAR(100) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
-    CONSTRAINT fk_analisisEnergetico_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
 
-
-
-CREATE TABLE analisisAcidosGrasos(
-    idAnalisisAcidosGrasos INT PRIMARY KEY AUTO_INCREMENT,
-    idAnalisis INT NOT NULL,
-    resultado NUMERIC(10,2) NOT NULL,
+-- Tabla de Análisis de Ácidos Grasos
+CREATE TABLE analisisacidosgrasos (
+    idAnalisisAcidosGrasos SERIAL PRIMARY KEY,
+    idAnalisis INTEGER NOT NULL,
+    resultado DECIMAL(10,4) NOT NULL,
     unidad VARCHAR(20) NOT NULL,
     metodoReferencia VARCHAR(100) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
-    resultadoTrans NUMERIC(10,2) NOT NULL,
-    resultadoSaturadas NUMERIC(10,2) NOT NULL,
-    resultadoMonoinsaturados NUMERIC(10,2) NOT NULL,
-    resultadoPolyinsaturados NUMERIC(10,2) NOT NULL,
-    total NUMERIC(10,2) NOT NULL,
-    CONSTRAINT fk_analisisAcidosGrasos_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
+    resultadoTrans DECIMAL(10,4),
+    resultadoSaturadas DECIMAL(10,4),
+    resultadoMonoinsaturados DECIMAL(10,4),
+    resultadoPolyinsaturados DECIMAL(10,4),
+    total DECIMAL(10,4),
+    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
 
+-- Tabla de Historial de Folios (FOLAV)
 CREATE TABLE folav (
-    idHistorial INT PRIMARY KEY AUTO_INCREMENT,
-    idAnalisis INT NOT NULL,
-    idUsuario INT NOT NULL,
-    fechaGeneracion TIMESTAMP NOT NULL,
-    CONSTRAINT fk_folav_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis)
-    CONSTRAINT fk_folav_usuario FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario)
+    idHistorial SERIAL PRIMARY KEY,
+    idAnalisis INTEGER NOT NULL,
+    idUsuario INTEGER NOT NULL,
+    fechaGeneracion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE,
+    FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario) ON DELETE CASCADE
 );
 
-CREATE TABLE contenidoNutrimental(
-    idContenidoNutrimental INT PRIMARY KEY AUTO_INCREMENT,
-    idMuestra INT NOT NULL,
-    idAnalisis INT NOT NULL,
-    idFolav INT NOT NULL,
-    idUsuario INT NOT NULL,
-    CONSTRAINT fk_contenidoNutrimental_muestra FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra),
-    CONSTRAINT fk_contenidoNutrimental_analisis FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis),
-    CONSTRAINT fk_contenidoNutrimental_folav FOREIGN KEY (idFolav) REFERENCES folav(idFolav),
-    CONSTRAINT fk_contenidoNutrimental_usuario FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario)
-)
+-- Tabla de Contenido Nutrimental
+CREATE TABLE contenidoNutrimental (
+    idContenidoNutrimental SERIAL PRIMARY KEY,
+    idMuestra INTEGER NOT NULL,
+    idAnalisis INTEGER NOT NULL,
+    idFolav INTEGER NOT NULL,
+    idUsuario INTEGER NOT NULL,
+    FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra) ON DELETE CASCADE,
+    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE,
+    FOREIGN KEY (idFolav) REFERENCES folav(idHistorial) ON DELETE CASCADE,
+    FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario) ON DELETE CASCADE
+);
+
+-- Índices para mejorar el rendimiento
+CREATE INDEX idx_muestra_idcliente ON muestra(idCliente);
+CREATE INDEX idx_analisis_idmuestra ON analisis(idMuestra);
+CREATE INDEX idx_usuarios_correo ON usuarios(correo);
+CREATE INDEX idx_clientes_razonsocial ON clientes(razonSocial);
+CREATE INDEX idx_folav_idanalisis ON folav(idAnalisis);
+CREATE INDEX idx_folav_idusuario ON folav(idUsuario);
