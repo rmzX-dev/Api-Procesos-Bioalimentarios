@@ -10,10 +10,10 @@ class User {
     return result.rows;
   }
 
-  static async findUserById(id_usuario) {
+  static async findUserById(idUsuario) {
     const result = await pool.query(
-      "SELECT * FROM usuarios WHERE id_usuario = $1",
-      [id_usuario]
+      "SELECT * FROM usuarios WHERE idUsuario = $1",
+      [idUsuario]
     );
     return result.rows[0];
   }
@@ -42,12 +42,11 @@ class User {
     return result.rows[0];
   }
 
-  static async updateUser(id_usuario, data) {
+  static async updateUser(idUsuario, data) {
     const {
       nombre,
       apellidoPaterno,
       apellidoMaterno,
-      fechaNacimiento,
       correo,
       contrasenia,
       telefono,
@@ -57,25 +56,24 @@ class User {
       hashedPassword = await bcrypt.hash(contrasenia, SALT_ROUNDS);
     }
     const result = await pool.query(
-      "UPDATE usuarios SET nombre = $1, apellidoPaterno = $2, apellidoMaterno = $3, fechaNacimiento = $4, correo = $5, contrasenia = $6, telefono = $7 WHERE id_usuario = $8 RETURNING *;",
+      "UPDATE usuarios SET nombre = $1, apellidoPaterno = $2, apellidoMaterno = $3, correo = $4, contrasenia = $5, telefono = $6 WHERE idUsuario = $7 RETURNING *;",
       [
         nombre,
         apellidoPaterno,
         apellidoMaterno,
-        fechaNacimiento,
         correo,
         hashedPassword,
         telefono,
-        id_usuario,
+        idUsuario,
       ]
     );
     return result.rows[0];
   }
 
-  static async deleteUser(id_usuario) {
+  static async deleteUser(idUsuario) {
     const result = await pool.query(
-      "DELETE FROM usuarios WHERE id_usuario = $1 RETURNING *;",
-      [id_usuario]
+      "DELETE FROM usuarios WHERE idUsuario = $1 RETURNING *;",
+      [idUsuario]
     );
     return result.rows[0];
   }
@@ -100,7 +98,7 @@ class User {
         return { status: 400, message: "Contraseña incorrecta" };
       }
 
-      const token = jwt.sign({ id: user.id_usuario }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ id: user.idUsuario }, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
 
@@ -108,10 +106,24 @@ class User {
         status: 200,
         message: "Login exitoso",
         token,
-        user: { id: user.id_usuario, correo: user.correo /* rol: user.id_rol (if you have) */ },
+        user: { id: user.idUsuario, correo: user.correo },
       };
     } catch (error) {
       console.error("Error en loginUser:", error);
+      return { status: 500, message: "Error del servidor" };
+    }
+  }
+
+  static async logoutUser(token) {
+    try {
+      // En una implementación más robusta, podrías almacenar tokens invalidados
+      // en una tabla de blacklist o usar Redis para invalidar tokens
+      return {
+        status: 200,
+        message: "Logout exitoso",
+      };
+    } catch (error) {
+      console.error("Error en logoutUser:", error);
       return { status: 500, message: "Error del servidor" };
     }
   }
