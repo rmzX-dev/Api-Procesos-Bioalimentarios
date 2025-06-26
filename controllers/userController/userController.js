@@ -62,6 +62,17 @@ class UserController {
     }
   }
 
+  static async logoutUser(req, res) {
+    try {
+      const token = req.headers.authorization?.split(' ')[1]; // Bearer TOKEN
+      const result = await User.logoutUser(token);
+      return res.status(result.status).json({ message: result.message });
+    } catch (error) {
+      console.error("Error en logoutUser controller:", error);
+      return res.status(500).json({ message: "Error del servidor" });
+    }
+  }
+
   static async deleteUser(req, res) {
     try {
       const user = await User.deleteUser(req.params.id);
