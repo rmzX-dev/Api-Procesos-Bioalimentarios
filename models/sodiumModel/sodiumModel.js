@@ -5,7 +5,7 @@ class Sodium {
         const { idAnalisis, resultado, unidad, metodoReferencia, acreditacion } = data;
 
         const result = await pool.query(
-            `INSERT INTO analisis_sodio (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
+            `INSERT INTO analisissodio (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
              VALUES ($1, $2, $3, $4, $5) RETURNING *`,
             [idAnalisis, resultado, unidad, metodoReferencia, acreditacion]
         );
@@ -15,7 +15,7 @@ class Sodium {
 
     static async getSodiumById(idAnalisis) {
         const result = await pool.query(
-            'SELECT * FROM analisis_sodio WHERE idAnalisis = $1',
+            'SELECT * FROM analisissodio WHERE idAnalisis = $1',
             [idAnalisis]
         );
         return result.rows[0];
@@ -23,7 +23,7 @@ class Sodium {
 
     static async getAllSodium() {
         const result = await pool.query(
-            'SELECT * FROM analisis_sodio'
+            'SELECT * FROM analisissodio'
         );
         return result.rows;
     }
