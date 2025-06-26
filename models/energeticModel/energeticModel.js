@@ -13,7 +13,7 @@ class Energetic {
         } = data;
 
         const result = await pool.query(
-            `INSERT INTO analisis_energetico (
+            `INSERT INTO analisisenergetico (
                 idAnalisis, resultadoKcal, resultadoKj, unidadKcal, unidadKj, metodoReferencia, acreditacion
             ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
             [idAnalisis, resultadoKcal, resultadoKj, unidadKcal, unidadKj, metodoReferencia, acreditacion]
@@ -24,7 +24,7 @@ class Energetic {
 
     static async getEnergeticById(idAnalisis) {
         const result = await pool.query(
-            'SELECT * FROM analisis_energetico WHERE idAnalisis = $1',
+            'SELECT * FROM analisisenergetico WHERE idAnalisis = $1',
             [idAnalisis]
         );
         return result.rows[0];
@@ -32,7 +32,7 @@ class Energetic {
 
     static async getAllEnergetic(){
         const result = await pool.query(
-            'SELECT * FROM analisis_energetico'
+            'SELECT * FROM analisisenergetico'
         );
         return result.rows;
     }
