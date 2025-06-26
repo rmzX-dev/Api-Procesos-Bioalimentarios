@@ -5,7 +5,7 @@ class Proteins{
         const { idAnalisis, resultado, unidad, metodoReferencia, acreditacion } = data;
 
         const result = await pool.query(
-            `INSERT INTO analisis_proteinas (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
+            `INSERT INTO analisisproteinas (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
              VALUES ($1, $2, $3, $4, $5) RETURNING *`,
             [idAnalisis, resultado, unidad, metodoReferencia, acreditacion]
         );
@@ -15,7 +15,7 @@ class Proteins{
 
     static async getProteinsById(idAnalisis){
         const result = await pool.query(
-            'SELECT * FROM analisis_proteinas WHERE idAnalisis = $1',
+            'SELECT * FROM analisisproteinas WHERE idAnalisis = $1',
             [idAnalisis]
         );
         return result.rows[0];
@@ -23,7 +23,7 @@ class Proteins{
 
     static async getAllProteins(){
         const result = await pool.query(
-            'SELECT * FROM analisis_proteinas'
+            'SELECT * FROM analisisproteinas'
         );
         return result.rows;
     }
