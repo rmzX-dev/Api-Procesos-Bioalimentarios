@@ -15,10 +15,12 @@ const router = express.Router();
  * @swagger
  * /api/excel/upload:
  *   post:
- *     summary: Subir múltiples archivos Excel
+ *     summary: Subir archivos Excel y generar un PDF con los resultados
  *     tags: [Excel]
  *     consumes:
  *       - multipart/form-data
+ *     produces:
+ *       - application/pdf
  *     requestBody:
  *       required: true
  *       content:
@@ -33,13 +35,20 @@ const router = express.Router();
  *                   format: binary
  *     responses:
  *       200:
- *         description: Archivos procesados correctamente
+ *         description: PDF generado y descargable
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
  *       400:
- *         description: Error al procesar los archivos
+ *         description: No se enviaron archivos válidos
+ *       500:
+ *         description: Error interno del servidor
  */
 router.post(
   '/excel/upload',
-  upload.array('archivos', 7), // permite subir hasta 6 archivos Excel
+  upload.array('archivos', 7),
   ExcelController.procesarMultiplesArchivos
 );
 
