@@ -1,0 +1,1567 @@
+openapi: 3.0.0
+info:
+  title: API Procesos Bioalimentarios
+  description: API para gestión de análisis de procesos bioalimentarios
+  version: 1.0.0
+  contact:
+    name: Aaron Ochoa Ramirez
+    email: 20233l001005@utcv.edu.mx
+
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor de desarrollo
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Usuario
+    Usuario:
+      type: object
+      properties:
+        idUsuario:
+          type: integer
+          description: ID único del usuario
+        nombre:
+          type: string
+          maxLength: 40
+          description: Nombre del usuario
+        apellidoPaterno:
+          type: string
+          maxLength: 40
+          description: Apellido paterno
+        apellidoMaterno:
+          type: string
+          maxLength: 40
+          description: Apellido materno
+        correo:
+          type: string
+          maxLength: 50
+          format: email
+          description: Correo electrónico
+        telefono:
+          type: string
+          maxLength: 20
+          description: Número de teléfono
+      required:
+        - nombre
+        - apellidoPaterno
+        - correo
+        - telefono
+
+    UsuarioCreate:
+      type: object
+      properties:
+        nombre:
+          type: string
+          maxLength: 40
+        apellidoPaterno:
+          type: string
+          maxLength: 40
+        apellidoMaterno:
+          type: string
+          maxLength: 40
+        correo:
+          type: string
+          maxLength: 50
+          format: email
+        contrasenia:
+          type: string
+          minLength: 6
+        telefono:
+          type: string
+          maxLength: 20
+      required:
+        - nombre
+        - apellidoPaterno
+        - correo
+        - contrasenia
+        - telefono
+
+    LoginRequest:
+      type: object
+      properties:
+        correo:
+          type: string
+          format: email
+        contrasenia:
+          type: string
+      required:
+        - correo
+        - contrasenia
+
+    LoginResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+        token:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            correo:
+              type: string
+
+    # Cliente
+    Cliente:
+      type: object
+      properties:
+        idCliente:
+          type: integer
+        nombre:
+          type: string
+          maxLength: 40
+        apellidoPaterno:
+          type: string
+          maxLength: 40
+        apellidoMaterno:
+          type: string
+          maxLength: 40
+        razonSocial:
+          type: string
+          maxLength: 200
+        direccion:
+          type: string
+          maxLength: 200
+        telefono:
+          type: string
+          maxLength: 20
+        metodo:
+          type: string
+          maxLength: 255
+        acreditacion:
+          type: string
+          maxLength: 255
+
+    ClienteCreate:
+      type: object
+      properties:
+        nombre:
+          type: string
+          maxLength: 40
+        apellidoPaterno:
+          type: string
+          maxLength: 40
+        apellidoMaterno:
+          type: string
+          maxLength: 40
+        razonSocial:
+          type: string
+          maxLength: 200
+        direccion:
+          type: string
+          maxLength: 200
+        telefono:
+          type: string
+          maxLength: 20
+        metodo:
+          type: string
+          maxLength: 255
+        acreditacion:
+          type: string
+          maxLength: 255
+      required:
+        - nombre
+        - apellidoPaterno
+        - razonSocial
+        - direccion
+        - telefono
+        - metodo
+        - acreditacion
+
+    # Muestra
+    Muestra:
+      type: object
+      properties:
+        idMuestra:
+          type: integer
+        idCliente:
+          type: integer
+        folio:
+          type: string
+          maxLength: 20
+        descripcion:
+          type: string
+        fechaMuestreo:
+          type: string
+          format: date
+        fechaRecepcion:
+          type: string
+          format: date
+        temperatura:
+          type: number
+          format: float
+
+    MuestraCreate:
+      type: object
+      properties:
+        idCliente:
+          type: integer
+        folio:
+          type: string
+          maxLength: 20
+        descripcion:
+          type: string
+        fechaMuestreo:
+          type: string
+          format: date
+        fechaRecepcion:
+          type: string
+          format: date
+        temperatura:
+          type: number
+          format: float
+      required:
+        - idCliente
+        - folio
+        - descripcion
+        - fechaMuestreo
+        - fechaRecepcion
+        - temperatura
+
+    # Análisis
+    Analisis:
+      type: object
+      properties:
+        idAnalisis:
+          type: integer
+        idMuestra:
+          type: integer
+        tipo:
+          type: string
+          maxLength: 50
+
+    AnalisisCreate:
+      type: object
+      properties:
+        idMuestra:
+          type: integer
+        tipo:
+          type: string
+          maxLength: 50
+      required:
+        - idMuestra
+        - tipo
+
+    # Análisis de Proteínas
+    AnalisisProteinas:
+      type: object
+      properties:
+        idAnalisisProteinas:
+          type: integer
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+
+    AnalisisProteinasCreate:
+      type: object
+      properties:
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+      required:
+        - idAnalisis
+        - resultado
+        - unidad
+        - metodoReferencia
+        - acreditacion
+
+        
+    # Análisis de Cenizas
+    AnalisisCenizas:
+      type: object
+      properties:
+        idAnalisisCenizas:
+          type: integer
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+
+    AnalisisCenizasCreate:
+      type: object
+      properties:
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+      required:
+        - idAnalisis
+        - resultado
+        - unidad
+        - metodoReferencia
+        - acreditacion
+
+    # Análisis de Humedad
+    AnalisisHumedad:
+      type: object
+      properties:
+        idAnalisisHumedad:
+          type: integer
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+
+    AnalisisHumedadCreate:
+      type: object
+      properties:
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+      required:
+        - idAnalisis
+        - resultado
+        - unidad
+        - metodoReferencia
+        - acreditacion
+
+    # Análisis de Fibra Dietética
+    AnalisisFibraDietetica:
+      type: object
+      properties:
+        idanalisisFibraDietetica:
+          type: integer
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+
+    AnalisisFibraDieteticaCreate:
+      type: object
+      properties:
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+      required:
+        - idAnalisis
+        - resultado
+        - unidad
+        - metodoReferencia
+        - acreditacion
+
+    # Análisis de Sodio
+    AnalisisSodio:
+      type: object
+      properties:
+        idanalisisSodio:
+          type: integer
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+
+    AnalisisSodioCreate:
+      type: object
+      properties:
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+      required:
+        - idAnalisis
+        - resultado
+        - unidad
+        - metodoReferencia
+        - acreditacion
+
+    # Análisis de Carbohidratos
+    AnalisisCarbohidratos:
+      type: object
+      properties:
+        idanalisisCarbohidratos:
+          type: integer
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+
+    AnalisisCarbohidratosCreate:
+      type: object
+      properties:
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+      required:
+        - idAnalisis
+        - resultado
+        - unidad
+        - metodoReferencia
+        - acreditacion
+
+    # Análisis Energético
+    AnalisisEnergetico:
+      type: object
+      properties:
+        idAnalisisEnergetico:
+          type: integer
+        idAnalisis:
+          type: integer
+        resultadoKcal:
+          type: number
+          format: float
+        resultadoKj:
+          type: number
+          format: float
+        unidadKcal:
+          type: string
+          maxLength: 20
+        unidadKj:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+
+    AnalisisEnergeticoCreate:
+      type: object
+      properties:
+        idAnalisis:
+          type: integer
+        resultadoKcal:
+          type: number
+          format: float
+        resultadoKj:
+          type: number
+          format: float
+        unidadKcal:
+          type: string
+          maxLength: 20
+        unidadKj:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+      required:
+        - idAnalisis
+        - resultadoKcal
+        - resultadoKj
+        - unidadKcal
+        - unidadKj
+        - metodoReferencia
+        - acreditacion
+
+    # Análisis de Ácidos Grasos
+    AnalisisAcidosGrasos:
+      type: object
+      properties:
+        idAnalisisAcidosGrasos:
+          type: integer
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+        resultadoTrans:
+          type: number
+          format: float
+        resultadoSaturadas:
+          type: number
+          format: float
+        resultadoMonoinsaturados:
+          type: number
+          format: float
+        resultadoPolyinsaturados:
+          type: number
+          format: float
+        total:
+          type: number
+          format: float
+
+    AnalisisAcidosGrasosCreate:
+      type: object
+      properties:
+        idAnalisis:
+          type: integer
+        resultado:
+          type: number
+          format: float
+        unidad:
+          type: string
+          maxLength: 20
+        metodoReferencia:
+          type: string
+          maxLength: 100
+        acreditacion:
+          type: string
+          maxLength: 10
+        resultadoTrans:
+          type: number
+          format: float
+        resultadoSaturadas:
+          type: number
+          format: float
+        resultadoMonoinsaturados:
+          type: number
+          format: float
+        resultadoPolyinsaturados:
+          type: number
+          format: float
+        total:
+          type: number
+          format: float
+      required:
+        - idAnalisis
+        - resultado
+        - unidad
+        - metodoReferencia
+        - acreditacion
+        - resultadoTrans
+        - resultadoSaturadas
+        - resultadoMonoinsaturados
+        - resultadoPolyinsaturados
+        - total
+
+    # Error Response
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+paths:
+  # ===== USUARIOS =====
+  /user:
+    get:
+      tags:
+        - Usuarios
+      summary: Obtener todos los usuarios
+      description: Retorna una lista de todos los usuarios registrados
+      responses:
+        '200':
+          description: Lista de usuarios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuario'
+        '500':
+          description: Error del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      tags:
+        - Usuarios
+      summary: Crear nuevo usuario
+      description: Crea un nuevo usuario en el sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioCreate'
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/{id}:
+    get:
+      tags:
+        - Usuarios
+      summary: Obtener usuario por ID
+      description: Retorna un usuario específico por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '404':
+          description: Usuario no encontrado
+        '500':
+          description: Error del servidor
+    
+    put:
+      tags:
+        - Usuarios
+      summary: Actualizar usuario
+      description: Actualiza los datos de un usuario existente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioCreate'
+      responses:
+        '200':
+          description: Usuario actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '404':
+          description: Usuario no encontrado
+        '500':
+          description: Error del servidor
+
+  /login:
+    post:
+      tags:
+        - Autenticación
+      summary: Iniciar sesión
+      description: Autentica un usuario y retorna un token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Error del servidor
+
+  /logout:
+    post:
+      tags:
+        - Autenticación
+      summary: Cerrar sesión
+      description: Cierra la sesión del usuario actual
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Logout exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Error del servidor
+
+  # ===== CLIENTES =====
+  /clientes:
+    get:
+      tags:
+        - Clientes
+      summary: Obtener todos los clientes
+      description: Retorna una lista de todos los clientes registrados
+      responses:
+        '200':
+          description: Lista de clientes obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+        '500':
+          description: Error del servidor
+    
+    post:
+      tags:
+        - Clientes
+      summary: Crear nuevo cliente
+      description: Crea un nuevo cliente en el sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteCreate'
+      responses:
+        '201':
+          description: Cliente creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+
+  /clientes/{id}:
+    get:
+      tags:
+        - Clientes
+      summary: Obtener cliente por ID
+      description: Retorna un cliente específico por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del cliente
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+        '404':
+          description: Cliente no encontrado
+        '500':
+          description: Error del servidor
+
+  # ===== MUESTRAS =====
+  /muestra:
+    get:
+      tags:
+        - Muestras
+      summary: Obtener todas las muestras
+      description: Retorna una lista de todas las muestras registradas
+      responses:
+        '200':
+          description: Lista de muestras obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Muestra'
+        '500':
+          description: Error del servidor
+    
+    post:
+      tags:
+        - Muestras
+      summary: Crear nueva muestra
+      description: Crea una nueva muestra en el sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MuestraCreate'
+      responses:
+        '201':
+          description: Muestra creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Muestra'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+
+  /muestra/{id}:
+    get:
+      tags:
+        - Muestras
+      summary: Obtener muestra por ID
+      description: Retorna una muestra específica por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la muestra
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Muestra encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Muestra'
+        '404':
+          description: Muestra no encontrada
+        '500':
+          description: Error del servidor
+
+  # ===== ANÁLISIS =====
+  /analisis:
+    get:
+      tags:
+        - Análisis
+      summary: Obtener todos los análisis
+      description: Retorna una lista de todos los análisis registrados
+      responses:
+        '200':
+          description: Lista de análisis obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Analisis'
+        '500':
+          description: Error del servidor
+    
+    post:
+      tags:
+        - Análisis
+      summary: Crear nuevo análisis
+      description: Crea un nuevo análisis en el sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalisisCreate'
+      responses:
+        '201':
+          description: Análisis creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Analisis'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+
+  /analisis/{id}:
+    get:
+      tags:
+        - Análisis
+      summary: Obtener análisis por ID
+      description: Retorna un análisis específico por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del análisis
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Análisis encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Analisis'
+        '404':
+          description: Análisis no encontrado
+        '500':
+          description: Error del servidor
+
+  # ===== ANÁLISIS DE PROTEÍNAS =====
+  /proteinas:
+    get:
+      tags:
+        - Análisis de Proteínas
+      summary: Obtener todos los análisis de proteínas
+      description: Retorna una lista de todos los análisis de proteínas
+      responses:
+        '200':
+          description: Lista de análisis de proteínas obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalisisProteinas'
+        '500':
+          description: Error del servidor
+    
+    post:
+      tags:
+        - Análisis de Proteínas
+      summary: Crear nuevo análisis de proteínas
+      description: Crea un nuevo análisis de proteínas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalisisProteinasCreate'
+      responses:
+        '201':
+          description: Análisis de proteínas creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisProteinas'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+
+  /proteinas/{id}:
+    get:
+      tags:
+        - Análisis de Proteínas
+      summary: Obtener análisis de proteínas por ID
+      description: Retorna un análisis de proteínas específico por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del análisis
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Análisis de proteínas encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisProteinas'
+        '404':
+          description: Análisis de proteínas no encontrado
+        '500':
+          description: Error del servidor
+
+  # ===== ANÁLISIS DE CENIZAS =====
+  /cenizas:
+    get:
+      tags:
+        - Análisis de Cenizas
+      summary: Obtener todos los análisis de cenizas
+      description: Retorna una lista de todos los análisis de cenizas
+      responses:
+        '200':
+          description: Lista de análisis de cenizas obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalisisCenizas'
+        '500':
+          description: Error del servidor
+    
+    post:
+      tags:
+        - Análisis de Cenizas
+      summary: Crear nuevo análisis de cenizas
+      description: Crea un nuevo análisis de cenizas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalisisCenizasCreate'
+      responses:
+        '201':
+          description: Análisis de cenizas creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisCenizas'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+
+  /cenizas/{id}:
+    get:
+      tags:
+        - Análisis de Cenizas
+      summary: Obtener análisis de cenizas por ID
+      description: Retorna un análisis de cenizas específico por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del análisis
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Análisis de cenizas encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisCenizas'
+        '404':
+          description: Análisis de cenizas no encontrado
+        '500':
+          description: Error del servidor
+
+  # ===== ANÁLISIS DE HUMEDAD =====
+  /humedad:
+    get:
+      tags:
+        - Análisis de Humedad
+      summary: Obtener todos los análisis de humedad
+      description: Retorna una lista de todos los análisis de humedad
+      responses:
+        '200':
+          description: Lista de análisis de humedad obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalisisHumedad'
+        '500':
+          description: Error del servidor
+    
+    post:
+      tags:
+        - Análisis de Humedad
+      summary: Crear nuevo análisis de humedad
+      description: Crea un nuevo análisis de humedad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalisisHumedadCreate'
+      responses:
+        '201':
+          description: Análisis de humedad creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisHumedad'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+
+  /humedad/{id}:
+    get:
+      tags:
+        - Análisis de Humedad
+      summary: Obtener análisis de humedad por ID
+      description: Retorna un análisis de humedad específico por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del análisis
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Análisis de humedad encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisHumedad'
+        '404':
+          description: Análisis de humedad no encontrado
+        '500':
+          description: Error del servidor
+
+  # ===== ANÁLISIS DE FIBRA DIETÉTICA =====
+  /fibra:
+    get:
+      tags:
+        - Análisis de Fibra Dietética
+      summary: Obtener todos los análisis de fibra dietética
+      description: Retorna una lista de todos los análisis de fibra dietética
+      responses:
+        '200':
+          description: Lista de análisis de fibra dietética obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalisisFibraDietetica'
+        '500':
+          description: Error del servidor
+    
+    post:
+      tags:
+        - Análisis de Fibra Dietética
+      summary: Crear nuevo análisis de fibra dietética
+      description: Crea un nuevo análisis de fibra dietética
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalisisFibraDieteticaCreate'
+      responses:
+        '201':
+          description: Análisis de fibra dietética creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisFibraDietetica'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+
+  /fibra/{id}:
+    get:
+      tags:
+        - Análisis de Fibra Dietética
+      summary: Obtener análisis de fibra dietética por ID
+      description: Retorna un análisis de fibra dietética específico por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del análisis
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Análisis de fibra dietética encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisFibraDietetica'
+        '404':
+          description: Análisis de fibra dietética no encontrado
+        '500':
+          description: Error del servidor
+
+  # ===== ANÁLISIS DE SODIO =====
+  /sodio:
+    get:
+      tags:
+        - Análisis de Sodio
+      summary: Obtener todos los análisis de sodio
+      description: Retorna una lista de todos los análisis de sodio
+      responses:
+        '200':
+          description: Lista de análisis de sodio obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalisisSodio'
+        '500':
+          description: Error del servidor
+    
+    post:
+      tags:
+        - Análisis de Sodio
+      summary: Crear nuevo análisis de sodio
+      description: Crea un nuevo análisis de sodio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalisisSodioCreate'
+      responses:
+        '201':
+          description: Análisis de sodio creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisSodio'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+
+  /sodio/{id}:
+    get:
+      tags:
+        - Análisis de Sodio
+      summary: Obtener análisis de sodio por ID
+      description: Retorna un análisis de sodio específico por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del análisis
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Análisis de sodio encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisSodio'
+        '404':
+          description: Análisis de sodio no encontrado
+        '500':
+          description: Error del servidor
+
+  # ===== ANÁLISIS DE CARBOHIDRATOS =====
+  /carbohidratos:
+    get:
+      tags:
+        - Análisis de Carbohidratos
+      summary: Obtener todos los análisis de carbohidratos
+      description: Retorna una lista de todos los análisis de carbohidratos
+      responses:
+        '200':
+          description: Lista de análisis de carbohidratos obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalisisCarbohidratos'
+        '500':
+          description: Error del servidor
+    
+    post:
+      tags:
+        - Análisis de Carbohidratos
+      summary: Crear nuevo análisis de carbohidratos
+      description: Crea un nuevo análisis de carbohidratos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalisisCarbohidratosCreate'
+      responses:
+        '201':
+          description: Análisis de carbohidratos creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisCarbohidratos'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+
+  /carbohidratos/{id}:
+    get:
+      tags:
+        - Análisis de Carbohidratos
+      summary: Obtener análisis de carbohidratos por ID
+      description: Retorna un análisis de carbohidratos específico por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del análisis
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Análisis de carbohidratos encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisCarbohidratos'
+        '404':
+          description: Análisis de carbohidratos no encontrado
+        '500':
+          description: Error del servidor
+
+  # ===== ANÁLISIS ENERGÉTICO =====
+  /energetico:
+    get:
+      tags:
+        - Análisis Energético
+      summary: Obtener todos los análisis energéticos
+      description: Retorna una lista de todos los análisis energéticos
+      responses:
+        '200':
+          description: Lista de análisis energéticos obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalisisEnergetico'
+        '500':
+          description: Error del servidor
+    
+    post:
+      tags:
+        - Análisis Energético
+      summary: Crear nuevo análisis energético
+      description: Crea un nuevo análisis energético
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalisisEnergeticoCreate'
+      responses:
+        '201':
+          description: Análisis energético creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisEnergetico'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+
+  /energetico/{id}:
+    get:
+      tags:
+        - Análisis Energético
+      summary: Obtener análisis energético por ID
+      description: Retorna un análisis energético específico por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del análisis
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Análisis energético encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisEnergetico'
+        '404':
+          description: Análisis energético no encontrado
+        '500':
+          description: Error del servidor
+
+  # ===== ANÁLISIS DE ÁCIDOS GRASOS =====
+  /acidosgrasos:
+    get:
+      tags:
+        - Análisis de Ácidos Grasos
+      summary: Obtener todos los análisis de ácidos grasos
+      description: Retorna una lista de todos los análisis de ácidos grasos
+      responses:
+        '200':
+          description: Lista de análisis de ácidos grasos obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalisisAcidosGrasos'
+        '500':
+          description: Error del servidor
+    
+    post:
+      tags:
+        - Análisis de Ácidos Grasos
+      summary: Crear nuevo análisis de ácidos grasos
+      description: Crea un nuevo análisis de ácidos grasos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalisisAcidosGrasosCreate'
+      responses:
+        '201':
+          description: Análisis de ácidos grasos creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisAcidosGrasos'
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error del servidor
+
+  /acidosgrasos/{id}:
+    get:
+      tags:
+        - Análisis de Ácidos Grasos
+      summary: Obtener análisis de ácidos grasos por ID
+      description: Retorna un análisis de ácidos grasos específico por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del análisis
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Análisis de ácidos grasos encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalisisAcidosGrasos'
+        '404':
+          description: Análisis de ácidos grasos no encontrado
+        '500':
+          description: Error del servidor

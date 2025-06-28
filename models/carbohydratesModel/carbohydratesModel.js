@@ -5,7 +5,7 @@ class Carbohydrates {
         const { idAnalisis, resultado, unidad, metodoReferencia, acreditacion } = data;
 
         const result = await pool.query(
-            `INSERT INTO analisis_carbohidratos (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
+            `INSERT INTO analisiscarbohidratos (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
              VALUES ($1, $2, $3, $4, $5) RETURNING *`,
             [idAnalisis, resultado, unidad, metodoReferencia, acreditacion]
         );
@@ -15,7 +15,7 @@ class Carbohydrates {
 
     static async getCarbsById(idAnalisis) {
         const result = await pool.query(
-            'SELECT * FROM analisis_carbohidratos WHERE idAnalisis = $1',
+            'SELECT * FROM analisiscarbohidratos WHERE idAnalisis = $1',
             [idAnalisis]
         );
         return result.rows[0];
@@ -23,7 +23,7 @@ class Carbohydrates {
 
     static async getAllCarbs(){
         const result = await pool.query(
-            'SELECT * FROM analisis_carbohidratos'
+            'SELECT * FROM analisiscarbohidratos'
         );
         return result.rows;
     }

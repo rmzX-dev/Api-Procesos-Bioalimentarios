@@ -1,108 +1,155 @@
-# **API de Gestión para Procesos Bioalimentarios** 🍏🔬
+# API de Gestión para Procesos Bioalimentarios
 
-API RESTful para la gestión integral de usuarios y perfiles en sistemas de procesos bioalimentarios, con autenticación JWT y operaciones CRUD.
-
----
-
-## **✨ Características Principales**
-
-✅ **Gestión de Usuarios**: Registro y administración de cuentas  
-✅ **Autenticación Segura**: JWT con expiración y hashing bcrypt  
-✅ **Documentación Swagger**: Interfaz interactiva para pruebas  
-✅ **Validación de Datos**: Seguridad en entradas y salidas
+API RESTful para la gestión integral de usuarios, clientes, muestras y análisis en sistemas de procesos bioalimentarios. Incluye autenticación JWT, documentación Swagger (OpenAPI 3.0) y estructura modular para fácil mantenimiento y escalabilidad.
 
 ---
 
-## **📋 Requisitos Técnicos**
+## 🚀 Tecnologías y Requisitos
 
-| Tecnología | Versión |
-| ---------- | ------- |
-| Node.js    | v14+    |
-| PostgreSQL | v12+    |
-| npm        | v6+     |
+- **Node.js** v14+
+- **PostgreSQL** v12+
+- **npm** v6+
 
-## **⚡ Instalación Rápida**
+---
 
-1. **Clonar repositorio**:
+## 📁 Estructura de Carpetas
 
-```bash
+```
+Api-Procesos-Bioalimentarios/
+├── app.js
+├── config/
+├── controllers/
+├── docs/
+├── middlewares/
+├── models/
+├── routes/
+├── services/
+├── templates/
+├── utils/
+├── package.json
+├── .env
+└── README.md
+```
+
+---
+
+## ⚡ Instalación y Configuración
+
+1. **Clona el repositorio:**
+   ```bash
 git clone https://github.com/rmzX-dev/Api-Procesos-Bioalimentarios.git
 cd Api-Procesos-Bioalimentarios
 ```
-
-2. **Instalar dependencias**:
-
-```bash
+2. **Instala dependencias:**
+   ```bash
 npm install
 ```
-
-3. **Configurar entorno**:  
-   Crear `.env` con:
-
-```env
-PG_USER=tu_usuario
-PG_HOST=localhost
-PG_DATABASE=bioalimentarios_db
-PG_PASSWORD=tu_contraseña
-PG_PORT=5432
+3. **Configura el entorno:**
+   Crea un archivo `.env` en la raíz con:
+   ```env
+DB_USER=tu_usuario
+DB_HOST=localhost
+DB_NAME=estadias
+DB_PASSWORD=tu_contraseña
+DB_PORT=5432
 PORT=3000
 JWT_SECRET=clave_secreta_ultrasegura
 ```
+4. **Configura la base de datos:**
+   - Asegúrate de tener PostgreSQL corriendo y la base de datos creada.
+   - Ejecuta el script de creación de tablas (ver carpeta `docs/` o usa los modelos como referencia).
 
-4. **Iniciar servidor**:
-
-```bash
+5. **Inicia el servidor:**
+   ```bash
 node app.js
 ```
 
-➡️ **Servidor activo en:** `http://localhost:3000`
+---
+
+## 📚 Documentación Swagger (OpenAPI)
+
+- Accede a la documentación interactiva en:
+  [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+- Toda la definición está en `docs/swagger.yaml` (no se usan comentarios en el código para Swagger).
 
 ---
 
-## **🔐 Autenticación JWT**
+## 🔐 Autenticación JWT
 
-### **🔑 Inicio de Sesión**
+- El login retorna un token JWT que debe enviarse en el header `Authorization: Bearer <token>` para endpoints protegidos.
+- El secreto se define en `.env` como `JWT_SECRET`.
 
-**`POST /api/login`**
-
+### Ejemplo de login
 ```json
+POST /api/login
 {
-  "correo": "admin@bioalimentarios.com",
-  "contrasenia": "SecurePass123"
+  "correo": "usuario@ejemplo.com",
+  "contrasenia": "tu_contraseña"
 }
 ```
-
-**Respuesta exitosa**:
-
+Respuesta:
 ```json
 {
   "status": 200,
   "message": "Login exitoso",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZFVzdWFyaW8iOjEsImNvcnJlbyI6InVzdWFyaW9AZWplbXBsby5jb20iLCJpYXQiOjE2OT...",
-  "user": {
-    "idUsuario": 1,
-    "nombre": "María",
-    "apellidoPaterno": "García",
-    "correo": "usuario@ejemplo.com",
-    "telefono": "5512345678"
-  }
+  "token": "...",
+  "user": { "id": 1, "correo": "usuario@ejemplo.com" }
 }
 ```
 
 ---
 
-## **📊 Endpoints Principales**
+## 📊 Endpoints Principales
 
-### **👥 Usuarios**
+| Método | Endpoint                | Descripción                        |
+|--------|-------------------------|------------------------------------|
+| POST   | `/api/login`            | Login y obtención de JWT           |
+| POST   | `/api/logout`           | Cierre de sesión (logout)          |
+| GET    | `/api/user`             | Listar todos los usuarios          |
+| POST   | `/api/user`             | Crear usuario                      |
+| GET    | `/api/user/{id}`        | Obtener usuario por ID             |
+| PUT    | `/api/user/{id}`        | Actualizar usuario                 |
+| GET    | `/api/clientes`         | Listar clientes                    |
+| POST   | `/api/clientes`         | Crear cliente                      |
+| GET    | `/api/clientes/{id}`    | Obtener cliente por ID             |
+| GET    | `/api/muestra`          | Listar muestras                    |
+| POST   | `/api/muestra`          | Crear muestra                      |
+| GET    | `/api/muestra/{id}`     | Obtener muestra por ID             |
+| GET    | `/api/analisis`         | Listar análisis                    |
+| POST   | `/api/analisis`         | Crear análisis                     |
+| GET    | `/api/analisis/{id}`    | Obtener análisis por ID            |
+| ...    | `/api/proteinas`        | CRUD análisis de proteínas         |
+| ...    | `/api/cenizas`          | CRUD análisis de cenizas           |
+| ...    | `/api/humedad`          | CRUD análisis de humedad           |
+| ...    | `/api/fibra`            | CRUD análisis de fibra dietética   |
+| ...    | `/api/sodio`            | CRUD análisis de sodio             |
+| ...    | `/api/carbohidratos`    | CRUD análisis de carbohidratos     |
+| ...    | `/api/energetico`       | CRUD análisis energético           |
+| ...    | `/api/acidosgrasos`     | CRUD análisis de ácidos grasos     |
 
-| Método | Endpoint         | Acción                 |
-| ------ | ---------------- | ---------------------- |
-| POST   | `/api/user`      | Crear usuario          |
-| GET    | `/api/user/{id}` | Obtener usuario por ID |
-| PUT    | `/api/user/{id}` | Actualizar usuario     |
+> Consulta la documentación Swagger para ver todos los endpoints, parámetros y respuestas detalladas.
 
-## **📚 Documentación Interactiva**
+---
 
-Explora todos los endpoints en:  
-🔗 **[http://localhost:3000/api-docs](http://localhost:3000/api-docs)**  
-Esta documentación está generada con Swagger y proporciona detalles sobre cada endpoint, los parámetros requeridos y las respuestas esperadas.
+## 🛠️ Buenas Prácticas
+- Usa variables de entorno para credenciales y secretos.
+- Mantén la estructura modular para facilitar el mantenimiento.
+- Usa la documentación Swagger para pruebas y desarrollo frontend.
+- Haz commits atómicos y descriptivos.
+
+---
+
+## 🧑‍💻 Contribuciones
+
+1. Haz un fork del repositorio
+2. Crea una rama (`git checkout -b feature/nueva-funcionalidad`)
+3. Haz tus cambios y commitea (`git commit -am 'feat: nueva funcionalidad'`)
+4. Haz push a tu rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
+
+---
+
+## 📬 Contacto
+
+Aaron Ochoa Ramirez  
+[20233l001005@utcv.edu.mx](mailto:20233l001005@utcv.edu.mx)
