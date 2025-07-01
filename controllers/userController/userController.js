@@ -37,9 +37,13 @@ class UserController {
       if (!user) {
         return res.status(404).json({ message: "User not found or already deleted" });
       }
-      res.json(user);
+       res.status(200).json({
+      message: "User updated successfully",
+      user: user
+    });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: error.message, stack: error.stack });
     }
   }
 
