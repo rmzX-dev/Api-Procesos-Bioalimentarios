@@ -5,7 +5,7 @@ class Ashes{
         const { idAnalisis, resultado, unidad, metodoReferencia, acreditacion } = data;
 
         const result = await pool.query(
-            `INSERT INTO analisis_cenizas (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
+            `INSERT INTO analisiscenizas (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
              VALUES ($1, $2, $3, $4, $5) RETURNING *`,
             [idAnalisis, resultado, unidad, metodoReferencia, acreditacion]
         );
@@ -16,7 +16,7 @@ class Ashes{
 
     static async getAshesById(idAnalisis){
         const result = await pool.query(
-            'SELECT * FROM analisis_cenizas WHERE idAnalisis = $1',
+            'SELECT * FROM analisiscenizas WHERE idAnalisis = $1',
             [idAnalisis]
         );
         return result.rows[0];
@@ -24,7 +24,7 @@ class Ashes{
 
     static async getAllAshes () {
         const result = await pool.query(
-            'SELECT * FROM analisis_cenizas'
+            'SELECT * FROM analisiscenizas'
         );
         return result.rows;
     }

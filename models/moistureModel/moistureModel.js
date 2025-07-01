@@ -1,11 +1,11 @@
 import pool from "../../config/db.js";
 
-class Mouisture {
+class Moisture {
     static async createAnalisisHumedad(data) {
         const { idAnalisis, resultado, unidad, metodoReferencia, acreditacion } = data;
 
         const result = await pool.query(
-            `INSERT INTO analisis_humedad (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
+            `INSERT INTO analisishumedad (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
              VALUES ($1, $2, $3, $4, $5) RETURNING *`,
             [idAnalisis, resultado, unidad, metodoReferencia, acreditacion]
         );
@@ -15,7 +15,7 @@ class Mouisture {
 
     static async getMoistureById(idAnalisis){
         const result = await pool.query(
-            'SELECT * FROM analisis_humedad WHERE idAnalisis = $1',
+            'SELECT * FROM analisishumedad WHERE idAnalisis = $1',
             [idAnalisis]
         );
         return result.rows[0];
@@ -23,11 +23,10 @@ class Mouisture {
 
     static async getAllMoisture(){
         const result = await pool.query(
-            'SELECT * FROM analisis_humedad'
-        )
+            'SELECT * FROM analisishumedad'
+        );
         return result.rows;
     }
 }
 
-
-export default Mouisture;
+export default Moisture;

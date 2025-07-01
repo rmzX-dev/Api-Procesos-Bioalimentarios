@@ -5,7 +5,7 @@ class DietaryFiber {
         const { idAnalisis, resultado, unidad, metodoReferencia, acreditacion } = data;
 
         const result = await pool.query(
-            `INSERT INTO analisis_fibra_dietetica (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
+            `INSERT INTO analisisfibradietetica (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
              VALUES ($1, $2, $3, $4, $5) RETURNING *`,
             [idAnalisis, resultado, unidad, metodoReferencia, acreditacion]
         );
@@ -15,7 +15,7 @@ class DietaryFiber {
 
     static async getFibraById(idAnalisis) {
         const result = await pool.query(
-            'SELECT * FROM analisis_fibra_dietetica WHERE idAnalisis = $1',
+            'SELECT * FROM analisisfibradietetica WHERE idAnalisis = $1',
             [idAnalisis]
         );
         return result.rows[0];
@@ -23,9 +23,9 @@ class DietaryFiber {
 
     static async getAllFibra(){
         const result = await pool.query(
-            'SELECT * FROM analisis_fibra_dietetica'
+            'SELECT * FROM analisisfibradietetica'
         );
-        return result.rows();
+        return result.rows;
     }
 }
 

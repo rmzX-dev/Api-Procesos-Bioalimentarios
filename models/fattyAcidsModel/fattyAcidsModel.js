@@ -16,7 +16,7 @@ class FattyAcids {
         } = data;
 
         const result = await pool.query(
-            `INSERT INTO analisis_acidos_grasos (
+            `INSERT INTO analisisacidosgrasos (
                 idAnalisis, resultado, unidad, metodoReferencia, acreditacion,
                 resultadoTrans, resultadoSaturadas, resultadoMonoinsaturados,
                 resultadoPolyinsaturados, total
@@ -33,7 +33,7 @@ class FattyAcids {
 
     static async getAcidosGrasosById(idAnalisis) {
         const result = await pool.query(
-            'SELECT * FROM analisis_acidos_grasos WHERE idAnalisis = $1',
+            'SELECT * FROM analisisacidosgrasos WHERE idAnalisis = $1',
             [idAnalisis]
         );
         return result.rows[0];
@@ -41,7 +41,7 @@ class FattyAcids {
 
     static async getAllAcidos(){
         const result = await pool.query(
-            'SELECT * FROM analisis_acidos_grasos'
+            'SELECT * FROM analisisacidosgrasos'
         );
         return result.rows;
     }
