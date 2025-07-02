@@ -12,7 +12,7 @@ class User {
 
   static async findUserById(idUsuario) {
     const result = await pool.query(
-      "SELECT * FROM usuarios WHERE idUsuario = $1",
+      "SELECT * FROM usuarios WHERE idusuario = $1",
       [idUsuario]
     );
     return result.rows[0];
@@ -121,13 +121,14 @@ class User {
       }
 
       const user = result.rows[0];
+      //console.log(user);
       const isMatch = await bcrypt.compare(contrasenia, user.contrasenia);
 
       if (!isMatch) {
         return { status: 400, message: "Contraseña incorrecta" };
       }
 
-      const token = jwt.sign({ id: user.idUsuario }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ id: user.idusuario }, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
 
@@ -135,7 +136,7 @@ class User {
         status: 200,
         message: "Login exitoso",
         token,
-        user: { id: user.idUsuario, correo: user.correo },
+        user: { id: user.idusuario, correo: user.correo },
       };
     } catch (error) {
       console.error("Error en loginUser:", error);
