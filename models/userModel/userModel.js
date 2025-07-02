@@ -121,6 +121,7 @@ class User {
       }
 
       const user = result.rows[0];
+      //console.log(user);
       const isMatch = await bcrypt.compare(contrasenia, user.contrasenia);
 
       if (!isMatch) {
