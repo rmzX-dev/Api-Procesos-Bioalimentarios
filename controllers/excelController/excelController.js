@@ -6,6 +6,10 @@ class ExcelController {
   static async procesarMultiplesArchivos(req, res) {
     try {
       const archivos = req.files;
+      const datosFormulario = req.body;
+
+      //console.log(datosFormulario);
+
       if (!archivos?.length) {
         return res.status(400).json({ mensaje: "No se enviaron archivos." });
       }
@@ -489,6 +493,7 @@ class ExcelController {
 
       // Tras obtener `resultados`...
       const humedadObj = resultados.find(r => Array.isArray(r.promediosHumedad));
+      //console.log(humedadObj);
       const cenizasObj = resultados.find(r => r.cenizasPromedio != null);
       const proteinaObj = resultados.find(r => r.proteina != null);
       const fibraObj = resultados.find(r => r.resultado != null);
@@ -513,6 +518,11 @@ class ExcelController {
       // Mapea TODO en un SOLO objeto:
       const data = {
         folio: humedadObj.folio,
+        nombreMuestrta: humedadObj.descripcion,
+        razonSocial: datosFormulario.nombre,
+        direccion: datosFormulario.direccion,
+        temperatura: datosFormulario.temperatura,
+        desviaciones: datosFormulario.desviaciones,
 
         valorH: fmt(humedadObj.promediosHumedad[0]),
         valorC: fmt(cenizasObj.cenizasPromedio),
@@ -531,51 +541,6 @@ class ExcelController {
       };
       // 2) Genera el Word con docxtemplater
       const docxBuffer = generateWordFromTemplate(data);
-
-      /* // 1) Reúne cada sección en su objeto de página
-       const humedadObj = resultados.find(r => r.promediosHumedad);
-       const cenizasObj = resultados.find(r => r.cenizasPromedio);
-       const proteinaObj = resultados.find(r => r.proteina);
-       const fibraObj = resultados.find(r => r.resultado);
-       const carbObj = resultados.find(r => r.carbohidratos);
-       const energiaObj = resultados.find(r => r.energiaKcal);
-       const sodioObj = resultados.find(r => r.mg);
-       const grasasObj = resultados.find(r => r.porcentajeGrasasTrans !== undefined);
- 
-       // 2) Construye los 3 objetos
-       const page1 = {
-         folio: humedadObj?.folio ?? '',
-         humedad: humedadObj?.promediosHumedad?.[0] ?? '',
-         cenizas: cenizasObj?.cenizasPromedio ?? '',
-         proteinas: proteinaObj?.proteina ?? ''
-       };
- 
-       const page2 = {
-         folio: humedadObj?.folio ?? '',
-         fibraDietetica: fibraObj?.resultado ?? '',
-         carbohidratos: carbObj?.carbohidratos ?? '',
-         sodio: sodioObj?.mg ?? '',
-         grasasTrans: grasasObj?.porcentajeGrasasTrans ?? '',
-         grasasSaturadas: grasasObj?.porcentajeGrasasSaturadas ?? '',
-         grasasPoliinsaturadas: grasasObj?.porcentajeGrasasPoliinsaturadas ?? '',
-         grasasMonoinsaturadas: grasasObj?.porcentajeGrasasMonoinsaturadas ?? '',
-         grasaTotal: grasasObj?.porcentajeGrasaTotal ?? '',
-         energiaKcal: energiaObj?.energiaKcal ?? '',
-         energiaKJ: energiaObj?.energiaKJ ?? ''
-       };
- 
-       const page3 = {
-         folio: humedadObj?.folio ?? ''
-       };
- 
-       // 1) Genera el PDF en memoria
-       const pdfBuffer = await generatePdf([ page1, page2, page3 ]);
- 
- 
-       // 2) Preparar respuesta para descarga
-       res.setHeader('Content-Type', 'application/pdf');
-       res.setHeader('Content-Disposition', 'attachment; filename="reporte.pdf"');
-       return res.send(pdfBuffer);*/
 
       // 3) Devuelve al cliente
       res
