@@ -1,5 +1,7 @@
 import xlsx from "xlsx";
-import { generatePdf } from "../../services/pdfService.js";
+//import { generatePdf } from "../../services/pdfService.js";
+import { generateWordFromTemplate } from "../../services/wordService.js";
+
 class ExcelController {
   static async procesarMultiplesArchivos(req, res) {
     try {
@@ -483,50 +485,107 @@ class ExcelController {
         return { nombre: originalname, error: "Formato no soportado" };
       });
 
-      // 1) Reúne cada sección en su objeto de página
-      const humedadObj = resultados.find(r => r.promediosHumedad);
-      const cenizasObj = resultados.find(r => r.cenizasPromedio);
-      const proteinaObj = resultados.find(r => r.proteina);
-      const fibraObj = resultados.find(r => r.resultado);
-      const carbObj = resultados.find(r => r.carbohidratos);
-      const energiaObj = resultados.find(r => r.energiaKcal);
-      const sodioObj = resultados.find(r => r.mg);
-      const grasasObj = resultados.find(r => r.porcentajeGrasasTrans !== undefined);
+      //console.log(">>> resultados:", resultados);
 
-      // 2) Construye los 3 objetos
-      const page1 = {
-        folio: humedadObj?.folio ?? '',
-        humedad: humedadObj?.promediosHumedad?.[0] ?? '',
-        cenizas: cenizasObj?.cenizasPromedio ?? '',
-        proteinas: proteinaObj?.proteina ?? ''
+      // Tras obtener `resultados`...
+      const humedadObj = resultados.find(r => Array.isArray(r.promediosHumedad));
+      const cenizasObj = resultados.find(r => r.cenizasPromedio != null);
+      const proteinaObj = resultados.find(r => r.proteina != null);
+      const fibraObj = resultados.find(r => r.resultado != null);
+      const carbObj = resultados.find(r => r.carbohidratos != null);
+      const sodioObj = resultados.find(r => r.mg != null);
+      const grasasObj = resultados.find(r => r.porcentajeGrasasTrans != undefined);
+
+      // Validación rápida
+      if (!humedadObj || !cenizasObj || !proteinaObj || !fibraObj ||
+        !carbObj || !sodioObj || !grasasObj) {
+        return res.status(400).json({
+          mensaje: "Faltan datos de alguna sección (humedad, cenizas, proteína, etc.)"
+        });
+      }
+
+      // helper para dos decimales
+      const fmt = num => typeof num === "number"
+        ? parseFloat(num.toFixed(2))
+        : num;
+
+
+      // Mapea TODO en un SOLO objeto:
+      const data = {
+        folio: humedadObj.folio,
+
+        valorH: fmt(humedadObj.promediosHumedad[0]),
+        valorC: fmt(cenizasObj.cenizasPromedio),
+        valoP: fmt(proteinaObj.proteina),       // <— ahora 6.56 en lugar de 6.5614...
+        valorF: fmt(fibraObj.resultado),
+        valorCH: fmt(carbObj.carbohidratos),
+        valorS: fmt(sodioObj.mg),
+        valorGT: fmt(grasasObj.porcentajeGrasasTrans),
+        valorGS: fmt(grasasObj.porcentajeGrasasSaturadas),
+        valorGP: fmt(grasasObj.porcentajeGrasasPoliinsaturadas),
+        valorGM: fmt(grasasObj.porcentajeGrasasMonoinsaturadas),
+        valorGTLS: fmt(grasasObj.porcentajeGrasaTotal),
+
+        valorKCAL: fmt(carbObj.energiaKcal),
+        valorKJ: fmt(carbObj.energiaKJ),
       };
+      // 2) Genera el Word con docxtemplater
+      const docxBuffer = generateWordFromTemplate(data);
 
-      const page2 = {
-        folio: humedadObj?.folio ?? '',
-        fibraDietetica: fibraObj?.resultado ?? '',
-        carbohidratos: carbObj?.carbohidratos ?? '',
-        sodio: sodioObj?.mg ?? '',
-        grasasTrans: grasasObj?.porcentajeGrasasTrans ?? '',
-        grasasSaturadas: grasasObj?.porcentajeGrasasSaturadas ?? '',
-        grasasPoliinsaturadas: grasasObj?.porcentajeGrasasPoliinsaturadas ?? '',
-        grasasMonoinsaturadas: grasasObj?.porcentajeGrasasMonoinsaturadas ?? '',
-        grasaTotal: grasasObj?.porcentajeGrasaTotal ?? '',
-        energiaKcal: energiaObj?.energiaKcal ?? '',
-        energiaKJ: energiaObj?.energiaKJ ?? ''
-      };
+      /* // 1) Reúne cada sección en su objeto de página
+       const humedadObj = resultados.find(r => r.promediosHumedad);
+       const cenizasObj = resultados.find(r => r.cenizasPromedio);
+       const proteinaObj = resultados.find(r => r.proteina);
+       const fibraObj = resultados.find(r => r.resultado);
+       const carbObj = resultados.find(r => r.carbohidratos);
+       const energiaObj = resultados.find(r => r.energiaKcal);
+       const sodioObj = resultados.find(r => r.mg);
+       const grasasObj = resultados.find(r => r.porcentajeGrasasTrans !== undefined);
+ 
+       // 2) Construye los 3 objetos
+       const page1 = {
+         folio: humedadObj?.folio ?? '',
+         humedad: humedadObj?.promediosHumedad?.[0] ?? '',
+         cenizas: cenizasObj?.cenizasPromedio ?? '',
+         proteinas: proteinaObj?.proteina ?? ''
+       };
+ 
+       const page2 = {
+         folio: humedadObj?.folio ?? '',
+         fibraDietetica: fibraObj?.resultado ?? '',
+         carbohidratos: carbObj?.carbohidratos ?? '',
+         sodio: sodioObj?.mg ?? '',
+         grasasTrans: grasasObj?.porcentajeGrasasTrans ?? '',
+         grasasSaturadas: grasasObj?.porcentajeGrasasSaturadas ?? '',
+         grasasPoliinsaturadas: grasasObj?.porcentajeGrasasPoliinsaturadas ?? '',
+         grasasMonoinsaturadas: grasasObj?.porcentajeGrasasMonoinsaturadas ?? '',
+         grasaTotal: grasasObj?.porcentajeGrasaTotal ?? '',
+         energiaKcal: energiaObj?.energiaKcal ?? '',
+         energiaKJ: energiaObj?.energiaKJ ?? ''
+       };
+ 
+       const page3 = {
+         folio: humedadObj?.folio ?? ''
+       };
+ 
+       // 1) Genera el PDF en memoria
+       const pdfBuffer = await generatePdf([ page1, page2, page3 ]);
+ 
+ 
+       // 2) Preparar respuesta para descarga
+       res.setHeader('Content-Type', 'application/pdf');
+       res.setHeader('Content-Disposition', 'attachment; filename="reporte.pdf"');
+       return res.send(pdfBuffer);*/
 
-      const page3 = {
-        folio: humedadObj?.folio ?? ''
-      };
-
-      // 1) Genera el PDF en memoria
-      const pdfBuffer = await generatePdf([ page1, page2, page3 ]);
-
-
-      // 2) Preparar respuesta para descarga
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename="reporte.pdf"');
-      return res.send(pdfBuffer);
+      // 3) Devuelve al cliente
+      res
+        .status(200)
+        .set({
+          "Content-Type":
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "Content-Disposition": 'attachment; filename="reporte.docx"',
+        })
+        .send(docxBuffer);
 
     } catch (error) {
       console.error("Error al procesar los archivos Excel:", error);

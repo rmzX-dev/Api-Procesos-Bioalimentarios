@@ -17,14 +17,19 @@
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
+    "docxtemplater": "^3.65.1",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
     "pg": "^8.16.0",
+    "pizzip": "^3.2.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "xlsx": "^0.18.5",
     "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/pizzip": "^3.1.2"
   }
 }

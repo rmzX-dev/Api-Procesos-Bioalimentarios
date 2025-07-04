@@ -297,7 +297,6 @@ components:
         - metodoReferencia
         - acreditacion
 
-        
     # Análisis de Cenizas
     AnalisisCenizas:
       type: object
@@ -680,21 +679,21 @@ paths:
       summary: Obtener todos los usuarios
       description: Retorna una lista de todos los usuarios registrados
       responses:
-        '200':
+        "200":
           description: Lista de usuarios obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Usuario'
-        '500':
+                  $ref: "#/components/schemas/Usuario"
+        "500":
           description: Error del servidor
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-    
+                $ref: "#/components/schemas/Error"
+
     post:
       tags:
         - Usuarios
@@ -705,22 +704,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UsuarioCreate'
+              $ref: "#/components/schemas/UsuarioCreate"
       responses:
-        '201':
+        "201":
           description: Usuario creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Usuario'
-        '400':
+                $ref: "#/components/schemas/Usuario"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /user/{id}:
     get:
@@ -736,17 +735,17 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Usuario encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Usuario'
-        '404':
+                $ref: "#/components/schemas/Usuario"
+        "404":
           description: Usuario no encontrado
-        '500':
+        "500":
           description: Error del servidor
-    
+
     put:
       tags:
         - Usuarios
@@ -764,17 +763,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UsuarioCreate'
+              $ref: "#/components/schemas/UsuarioCreate"
       responses:
-        '200':
+        "200":
           description: Usuario actualizado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Usuario'
-        '404':
+                $ref: "#/components/schemas/Usuario"
+        "404":
           description: Usuario no encontrado
-        '500':
+        "500":
           description: Error del servidor
 
   /login:
@@ -788,15 +787,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: "#/components/schemas/LoginRequest"
       responses:
-        '200':
+        "200":
           description: Login exitoso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
-        '400':
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
           description: Credenciales inválidas
           content:
             application/json:
@@ -805,7 +804,7 @@ paths:
                 properties:
                   message:
                     type: string
-        '500':
+        "500":
           description: Error del servidor
 
   /logout:
@@ -817,7 +816,7 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Logout exitoso
           content:
             application/json:
@@ -826,7 +825,7 @@ paths:
                 properties:
                   message:
                     type: string
-        '500':
+        "500":
           description: Error del servidor
 
   # ===== CLIENTES =====
@@ -837,17 +836,17 @@ paths:
       summary: Obtener todos los clientes
       description: Retorna una lista de todos los clientes registrados
       responses:
-        '200':
+        "200":
           description: Lista de clientes obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Cliente'
-        '500':
+                  $ref: "#/components/schemas/Cliente"
+        "500":
           description: Error del servidor
-    
+
     post:
       tags:
         - Clientes
@@ -858,17 +857,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ClienteCreate'
+              $ref: "#/components/schemas/ClienteCreate"
       responses:
-        '201':
+        "201":
           description: Cliente creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cliente'
-        '400':
+                $ref: "#/components/schemas/Cliente"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
 
   /clientes/{id}:
@@ -885,15 +884,15 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Cliente encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cliente'
-        '404':
+                $ref: "#/components/schemas/Cliente"
+        "404":
           description: Cliente no encontrado
-        '500':
+        "500":
           description: Error del servidor
 
   # ===== MUESTRAS =====
@@ -904,17 +903,17 @@ paths:
       summary: Obtener todas las muestras
       description: Retorna una lista de todas las muestras registradas
       responses:
-        '200':
+        "200":
           description: Lista de muestras obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Muestra'
-        '500':
+                  $ref: "#/components/schemas/Muestra"
+        "500":
           description: Error del servidor
-    
+
     post:
       tags:
         - Muestras
@@ -925,17 +924,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MuestraCreate'
+              $ref: "#/components/schemas/MuestraCreate"
       responses:
-        '201':
+        "201":
           description: Muestra creada exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Muestra'
-        '400':
+                $ref: "#/components/schemas/Muestra"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
 
   /muestra/{id}:
@@ -952,15 +951,15 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Muestra encontrada
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Muestra'
-        '404':
+                $ref: "#/components/schemas/Muestra"
+        "404":
           description: Muestra no encontrada
-        '500':
+        "500":
           description: Error del servidor
 
   # ===== ANÁLISIS =====
@@ -971,17 +970,17 @@ paths:
       summary: Obtener todos los análisis
       description: Retorna una lista de todos los análisis registrados
       responses:
-        '200':
+        "200":
           description: Lista de análisis obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Analisis'
-        '500':
+                  $ref: "#/components/schemas/Analisis"
+        "500":
           description: Error del servidor
-    
+
     post:
       tags:
         - Análisis
@@ -992,17 +991,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalisisCreate'
+              $ref: "#/components/schemas/AnalisisCreate"
       responses:
-        '201':
+        "201":
           description: Análisis creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Analisis'
-        '400':
+                $ref: "#/components/schemas/Analisis"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
 
   /analisis/{id}:
@@ -1019,15 +1018,15 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Análisis encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Analisis'
-        '404':
+                $ref: "#/components/schemas/Analisis"
+        "404":
           description: Análisis no encontrado
-        '500':
+        "500":
           description: Error del servidor
 
   # ===== ANÁLISIS DE PROTEÍNAS =====
@@ -1038,17 +1037,17 @@ paths:
       summary: Obtener todos los análisis de proteínas
       description: Retorna una lista de todos los análisis de proteínas
       responses:
-        '200':
+        "200":
           description: Lista de análisis de proteínas obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AnalisisProteinas'
-        '500':
+                  $ref: "#/components/schemas/AnalisisProteinas"
+        "500":
           description: Error del servidor
-    
+
     post:
       tags:
         - Análisis de Proteínas
@@ -1059,17 +1058,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalisisProteinasCreate'
+              $ref: "#/components/schemas/AnalisisProteinasCreate"
       responses:
-        '201':
+        "201":
           description: Análisis de proteínas creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisProteinas'
-        '400':
+                $ref: "#/components/schemas/AnalisisProteinas"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
 
   /proteinas/{id}:
@@ -1086,15 +1085,15 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Análisis de proteínas encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisProteinas'
-        '404':
+                $ref: "#/components/schemas/AnalisisProteinas"
+        "404":
           description: Análisis de proteínas no encontrado
-        '500':
+        "500":
           description: Error del servidor
 
   # ===== ANÁLISIS DE CENIZAS =====
@@ -1105,17 +1104,17 @@ paths:
       summary: Obtener todos los análisis de cenizas
       description: Retorna una lista de todos los análisis de cenizas
       responses:
-        '200':
+        "200":
           description: Lista de análisis de cenizas obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AnalisisCenizas'
-        '500':
+                  $ref: "#/components/schemas/AnalisisCenizas"
+        "500":
           description: Error del servidor
-    
+
     post:
       tags:
         - Análisis de Cenizas
@@ -1126,17 +1125,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalisisCenizasCreate'
+              $ref: "#/components/schemas/AnalisisCenizasCreate"
       responses:
-        '201':
+        "201":
           description: Análisis de cenizas creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisCenizas'
-        '400':
+                $ref: "#/components/schemas/AnalisisCenizas"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
 
   /cenizas/{id}:
@@ -1153,15 +1152,15 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Análisis de cenizas encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisCenizas'
-        '404':
+                $ref: "#/components/schemas/AnalisisCenizas"
+        "404":
           description: Análisis de cenizas no encontrado
-        '500':
+        "500":
           description: Error del servidor
 
   # ===== ANÁLISIS DE HUMEDAD =====
@@ -1172,17 +1171,17 @@ paths:
       summary: Obtener todos los análisis de humedad
       description: Retorna una lista de todos los análisis de humedad
       responses:
-        '200':
+        "200":
           description: Lista de análisis de humedad obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AnalisisHumedad'
-        '500':
+                  $ref: "#/components/schemas/AnalisisHumedad"
+        "500":
           description: Error del servidor
-    
+
     post:
       tags:
         - Análisis de Humedad
@@ -1193,17 +1192,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalisisHumedadCreate'
+              $ref: "#/components/schemas/AnalisisHumedadCreate"
       responses:
-        '201':
+        "201":
           description: Análisis de humedad creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisHumedad'
-        '400':
+                $ref: "#/components/schemas/AnalisisHumedad"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
 
   /humedad/{id}:
@@ -1220,15 +1219,15 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Análisis de humedad encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisHumedad'
-        '404':
+                $ref: "#/components/schemas/AnalisisHumedad"
+        "404":
           description: Análisis de humedad no encontrado
-        '500':
+        "500":
           description: Error del servidor
 
   # ===== ANÁLISIS DE FIBRA DIETÉTICA =====
@@ -1239,17 +1238,17 @@ paths:
       summary: Obtener todos los análisis de fibra dietética
       description: Retorna una lista de todos los análisis de fibra dietética
       responses:
-        '200':
+        "200":
           description: Lista de análisis de fibra dietética obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AnalisisFibraDietetica'
-        '500':
+                  $ref: "#/components/schemas/AnalisisFibraDietetica"
+        "500":
           description: Error del servidor
-    
+
     post:
       tags:
         - Análisis de Fibra Dietética
@@ -1260,17 +1259,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalisisFibraDieteticaCreate'
+              $ref: "#/components/schemas/AnalisisFibraDieteticaCreate"
       responses:
-        '201':
+        "201":
           description: Análisis de fibra dietética creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisFibraDietetica'
-        '400':
+                $ref: "#/components/schemas/AnalisisFibraDietetica"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
 
   /fibra/{id}:
@@ -1287,15 +1286,15 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Análisis de fibra dietética encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisFibraDietetica'
-        '404':
+                $ref: "#/components/schemas/AnalisisFibraDietetica"
+        "404":
           description: Análisis de fibra dietética no encontrado
-        '500':
+        "500":
           description: Error del servidor
 
   # ===== ANÁLISIS DE SODIO =====
@@ -1306,17 +1305,17 @@ paths:
       summary: Obtener todos los análisis de sodio
       description: Retorna una lista de todos los análisis de sodio
       responses:
-        '200':
+        "200":
           description: Lista de análisis de sodio obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AnalisisSodio'
-        '500':
+                  $ref: "#/components/schemas/AnalisisSodio"
+        "500":
           description: Error del servidor
-    
+
     post:
       tags:
         - Análisis de Sodio
@@ -1327,17 +1326,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalisisSodioCreate'
+              $ref: "#/components/schemas/AnalisisSodioCreate"
       responses:
-        '201':
+        "201":
           description: Análisis de sodio creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisSodio'
-        '400':
+                $ref: "#/components/schemas/AnalisisSodio"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
 
   /sodio/{id}:
@@ -1354,15 +1353,15 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Análisis de sodio encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisSodio'
-        '404':
+                $ref: "#/components/schemas/AnalisisSodio"
+        "404":
           description: Análisis de sodio no encontrado
-        '500':
+        "500":
           description: Error del servidor
 
   # ===== ANÁLISIS DE CARBOHIDRATOS =====
@@ -1373,17 +1372,17 @@ paths:
       summary: Obtener todos los análisis de carbohidratos
       description: Retorna una lista de todos los análisis de carbohidratos
       responses:
-        '200':
+        "200":
           description: Lista de análisis de carbohidratos obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AnalisisCarbohidratos'
-        '500':
+                  $ref: "#/components/schemas/AnalisisCarbohidratos"
+        "500":
           description: Error del servidor
-    
+
     post:
       tags:
         - Análisis de Carbohidratos
@@ -1394,17 +1393,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalisisCarbohidratosCreate'
+              $ref: "#/components/schemas/AnalisisCarbohidratosCreate"
       responses:
-        '201':
+        "201":
           description: Análisis de carbohidratos creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisCarbohidratos'
-        '400':
+                $ref: "#/components/schemas/AnalisisCarbohidratos"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
 
   /carbohidratos/{id}:
@@ -1421,15 +1420,15 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Análisis de carbohidratos encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisCarbohidratos'
-        '404':
+                $ref: "#/components/schemas/AnalisisCarbohidratos"
+        "404":
           description: Análisis de carbohidratos no encontrado
-        '500':
+        "500":
           description: Error del servidor
 
   # ===== ANÁLISIS ENERGÉTICO =====
@@ -1440,17 +1439,17 @@ paths:
       summary: Obtener todos los análisis energéticos
       description: Retorna una lista de todos los análisis energéticos
       responses:
-        '200':
+        "200":
           description: Lista de análisis energéticos obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AnalisisEnergetico'
-        '500':
+                  $ref: "#/components/schemas/AnalisisEnergetico"
+        "500":
           description: Error del servidor
-    
+
     post:
       tags:
         - Análisis Energético
@@ -1461,17 +1460,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalisisEnergeticoCreate'
+              $ref: "#/components/schemas/AnalisisEnergeticoCreate"
       responses:
-        '201':
+        "201":
           description: Análisis energético creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisEnergetico'
-        '400':
+                $ref: "#/components/schemas/AnalisisEnergetico"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
 
   /energetico/{id}:
@@ -1488,15 +1487,15 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Análisis energético encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisEnergetico'
-        '404':
+                $ref: "#/components/schemas/AnalisisEnergetico"
+        "404":
           description: Análisis energético no encontrado
-        '500':
+        "500":
           description: Error del servidor
 
   # ===== ANÁLISIS DE ÁCIDOS GRASOS =====
@@ -1507,17 +1506,17 @@ paths:
       summary: Obtener todos los análisis de ácidos grasos
       description: Retorna una lista de todos los análisis de ácidos grasos
       responses:
-        '200':
+        "200":
           description: Lista de análisis de ácidos grasos obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AnalisisAcidosGrasos'
-        '500':
+                  $ref: "#/components/schemas/AnalisisAcidosGrasos"
+        "500":
           description: Error del servidor
-    
+
     post:
       tags:
         - Análisis de Ácidos Grasos
@@ -1528,17 +1527,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnalisisAcidosGrasosCreate'
+              $ref: "#/components/schemas/AnalisisAcidosGrasosCreate"
       responses:
-        '201':
+        "201":
           description: Análisis de ácidos grasos creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisAcidosGrasos'
-        '400':
+                $ref: "#/components/schemas/AnalisisAcidosGrasos"
+        "400":
           description: Datos inválidos
-        '500':
+        "500":
           description: Error del servidor
 
   /acidosgrasos/{id}:
@@ -1555,13 +1554,54 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Análisis de ácidos grasos encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalisisAcidosGrasos'
-        '404':
+                $ref: "#/components/schemas/AnalisisAcidosGrasos"
+        "404":
           description: Análisis de ácidos grasos no encontrado
-        '500':
+        "500":
           description: Error del servidor
+
+  /excel/upload:
+    post:
+      tags:
+        - Excel
+      summary: Subir Excel y generar PDF o Word
+      parameters:
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [pdf, docx]
+          description: El formato de salida (por defecto pdf)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                archivos:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        "200":
+          description: Archivo generado (PDF o Word)
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
