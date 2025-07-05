@@ -1,12 +1,15 @@
 import xlsx from "xlsx";
 //import { generatePdf } from "../../services/pdfService.js";
 import { generateWordFromTemplate } from "../../services/wordService.js";
+import { docxToPdf } from "../../services/convertService.js";
+
 
 class ExcelController {
   static async procesarMultiplesArchivos(req, res) {
     try {
       const archivos = req.files;
       const datosFormulario = req.body;
+      const format = req.body.format;
 
       //console.log(datosFormulario);
 
@@ -542,8 +545,22 @@ class ExcelController {
       // 2) Genera el Word con docxtemplater
       const docxBuffer = generateWordFromTemplate(data);
 
+      if (format === 'pdf') {
+        // Convierte el DOCX a PDF
+        const pdfBuffer = await docxToPdf(docxBuffer);
+
+        return res
+          .status(200)
+          .set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': 'attachment; filename="reporte.pdf"',
+          })
+          .send(pdfBuffer);
+
+      }
+
       // 3) Devuelve al cliente
-      res
+      return res
         .status(200)
         .set({
           "Content-Type":
