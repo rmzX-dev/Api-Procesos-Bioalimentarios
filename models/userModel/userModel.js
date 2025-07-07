@@ -102,10 +102,12 @@ class User {
   static async deleteUser(idUsuario) {
     const result = await pool.query(
       "DELETE FROM usuarios WHERE idUsuario = $1 RETURNING *;",
-      [id_usuario]
+      [idUsuario]
     );
     return result.rows[0];
   }
+
+
 
   static async loginUser(data) {
     const { correo, contrasenia } = data;
