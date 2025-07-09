@@ -19,6 +19,7 @@ const __dirname  = path.dirname(__filename);
  *     nombreMuestrta: string,
  *     temperatura: number|string,
  *     desviaciones: string,
+ *     fecha: string,
  *     valorH: number|string,
  *     valorC: number|string,
  *     valorP: number|string,
@@ -31,7 +32,15 @@ const __dirname  = path.dirname(__filename);
  *     valorGM: number|string,
  *     valorGTLS: number|string,
  *     valorKCAL: number|string,
- *     valorKJ: number|string
+ *     valorKJ: number|string,
+ *     AH: string,
+ *     AC: string,
+ *     AP: string,
+ *     AF: string,
+ *     ACH: string,
+ *     AS: string,
+ *     AG: string,
+ *     ACE: string
  *   }
  */
 export function generateWordFromTemplate(data) {
