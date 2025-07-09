@@ -2,6 +2,8 @@ import xlsx from "xlsx";
 //import { generatePdf } from "../../services/pdfService.js";
 import { generateWordFromTemplate } from "../../services/wordService.js";
 import { docxToPdf } from "../../services/convertService.js";
+import { generarFechaFormatoReporte } from '../../utils/fecha.js';
+
 
 
 class ExcelController {
@@ -494,6 +496,14 @@ class ExcelController {
 
       //console.log(">>> resultados:", resultados);
 
+      const detalles = JSON.parse(req.body.detalles);
+      //console.log(detalles);
+
+      const getAcreditacion = pruebaNombre => {
+        const entry = detalles.find(d => d.prueba === pruebaNombre);
+        return entry ? entry.acreditacion : '';
+      };
+
       // Tras obtener `resultados`...
       const humedadObj = resultados.find(r => Array.isArray(r.promediosHumedad));
       //console.log(humedadObj);
@@ -512,6 +522,9 @@ class ExcelController {
         });
       }
 
+      //crear una const para almaacenar lo que me retorne la funcion de utils/fecha.js
+      const fechaCreacion = generarFechaFormatoReporte();
+
       // helper para dos decimales
       const fmt = num => typeof num === "number"
         ? parseFloat(num.toFixed(2))
@@ -526,6 +539,7 @@ class ExcelController {
         direccion: datosFormulario.direccion,
         temperatura: datosFormulario.temperatura,
         desviaciones: datosFormulario.desviaciones,
+        fecha: fechaCreacion,
 
         valorH: fmt(humedadObj.promediosHumedad[0]),
         valorC: fmt(cenizasObj.cenizasPromedio),
@@ -541,6 +555,14 @@ class ExcelController {
 
         valorKCAL: fmt(carbObj.energiaKcal),
         valorKJ: fmt(carbObj.energiaKJ),
+        AH: getAcreditacion('Humedad'),
+        AC: getAcreditacion('Cenizas'),
+        AP: getAcreditacion('Proteínas'),
+        AF: getAcreditacion('Fibra dietética'),
+        ACH: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)'),
+        AS: getAcreditacion('Sodio'),
+        AG: getAcreditacion('Perfil de ácidos grasos'),
+        ACE: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)')
       };
       // 2) Genera el Word con docxtemplater
       const docxBuffer = generateWordFromTemplate(data);
