@@ -49,7 +49,7 @@ CREATE TABLE analisis (
 CREATE TABLE analisishumedad (
     idAnalisisHumedad SERIAL PRIMARY KEY,
     idAnalisis INTEGER NOT NULL,
-    resultado DECIMAL(10,4) NOT NULL,
+    resultado DECIMAL(10,2) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
     FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
@@ -59,7 +59,7 @@ CREATE TABLE analisishumedad (
 CREATE TABLE analisisproteinas (
     idAnalisisProteinas SERIAL PRIMARY KEY,
     idAnalisis INTEGER NOT NULL,
-    resultado DECIMAL(10,4) NOT NULL,
+    resultado DECIMAL(10,2) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
     FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
@@ -68,7 +68,7 @@ CREATE TABLE analisisproteinas (
 CREATE TABLE analisiscenizas (
     idAnalisisCenizas SERIAL PRIMARY KEY,
     idAnalisis INTEGER NOT NULL,
-    resultado DECIMAL(10,4) NOT NULL,
+    resultado DECIMAL(10,2) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
     FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
@@ -77,7 +77,7 @@ CREATE TABLE analisiscenizas (
 CREATE TABLE analisisfibradietetica (
     idanalisisFibraDietetica SERIAL PRIMARY KEY,
     idAnalisis INTEGER NOT NULL,
-    resultado DECIMAL(10,4) NOT NULL,
+    resultado DECIMAL(10,2) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
     FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
@@ -86,7 +86,7 @@ CREATE TABLE analisisfibradietetica (
 CREATE TABLE analisiscarbohidratos (
     idAnalisisCarbohidratos SERIAL PRIMARY KEY,
     idAnalisis INTEGER NOT NULL,
-    resultado DECIMAL(10,4) NOT NULL,
+    resultado DECIMAL(10,2) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
     FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
@@ -95,7 +95,7 @@ CREATE TABLE analisiscarbohidratos (
 CREATE TABLE analisissodio (
     idAnalisisSodio SERIAL PRIMARY KEY,
     idAnalisis INTEGER NOT NULL,
-    resultado DECIMAL(10,4) NOT NULL,
+    resultado DECIMAL(10,2) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
     FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
@@ -104,8 +104,8 @@ CREATE TABLE analisissodio (
 CREATE TABLE analisisenergetico (
     idAnalisisEnergetico SERIAL PRIMARY KEY,
     idAnalisis INTEGER NOT NULL,
-    resultadoKcal DECIMAL(10,4) NOT NULL,
-    resultadoKj DECIMAL(10,4) NOT NULL,
+    resultadoKcal DECIMAL(10,2) NOT NULL,
+    resultadoKj DECIMAL(10,2) NOT NULL,
     acreditacion VARCHAR(10) NOT NULL,
     FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
@@ -114,11 +114,11 @@ CREATE TABLE analisisenergetico (
 CREATE TABLE analisisacidosgrasos (
     idAnalisisAcidosGrasos SERIAL PRIMARY KEY,
     idAnalisis INTEGER NOT NULL,
-    resultadoTrans DECIMAL(10,4),
-    resultadoSaturadas DECIMAL(10,4),
-    resultadoMonoinsaturados DECIMAL(10,4),
-    resultadoPolyinsaturados DECIMAL(10,4),
-    total DECIMAL(10,4),
+    resultadoTrans DECIMAL(10,2),
+    resultadoSaturadas DECIMAL(10,2),
+    resultadoMonoinsaturados DECIMAL(10,2),
+    resultadoPolyinsaturados DECIMAL(10,2),
+    total DECIMAL(10,2),
     acreditacion VARCHAR(10) NOT NULL,
     FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
