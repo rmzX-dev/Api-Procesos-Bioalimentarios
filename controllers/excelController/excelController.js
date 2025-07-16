@@ -3,7 +3,18 @@ import xlsx from "xlsx";
 import { generateWordFromTemplate } from "../../services/wordService.js";
 import { docxToPdf } from "../../services/convertService.js";
 import { generarFechaFormatoReporte } from '../../utils/fecha.js';
-
+import  Cliente  from "../../models/clientModel/clientModel.js";
+import  Moisture  from "../../models/moistureModel/moistureModel.js";
+import  Ashes  from "../../models/ashesModel/ashesModel.js";
+import  Carbohydrates  from "../../models/carbohydratesModel/carbohydratesModel.js";
+import  DietaryFiber  from "../../models/dietaryFiberModel/dietaryFiberModel.js";
+import  Energetic  from "../../models/energeticModel/energeticModel.js";
+import  FattyAcids  from "../../models/fattyAcidsModel/fattyAcidsModel.js";
+import  Proteins  from "../../models/proteinsModel/proteinsModel.js";
+import  Sodium  from "../../models/sodiumModel/sodiumModel.js";
+import  Analisis  from "../../models/analysisModel/analysisModel.js";
+import  Muestra  from "../../models/sampleModel/sampleModel.js";
+import Folav from "../../models/folavModel/folavModel.js";
 
 
 class ExcelController {
@@ -529,6 +540,86 @@ class ExcelController {
       const fmt = num => typeof num === "number"
         ? parseFloat(num.toFixed(2))
         : num;
+
+      const cliente = await Cliente.createCliente({
+        razonSocial: datosFormulario.nombre,
+        direccion: datosFormulario.direccion
+      });
+
+      //console.log(cliente);
+
+      // 2. Crear la muestra (usa el folio y más datos si tienes)
+      const muestra = await Muestra.createSample({
+        idCliente: cliente.idcliente, // asumiendo que el campo se llama así
+        descripcion: humedadObj.descripcion
+      });
+
+      const analisis = await Analisis.createAnalisis({
+        idMuestra: muestra.idmuestra,
+        folio: humedadObj.folio,
+        temperatura: datosFormulario.temperatura
+      });
+
+      const moisture = await Moisture.createMoisture({
+        idAnalisis: analisis.idanalisis,
+        resultado:  fmt(humedadObj.promediosHumedad[0]),
+        acreditacion: getAcreditacion('Humedad')
+      });
+
+      const proteins = await Proteins.createAnalisisProteins({
+        idAnalisis: analisis.idanalisis,
+        resultado: fmt(proteinaObj.proteina),
+        acreditacion: getAcreditacion('Proteínas')
+      });
+
+      const ashes = await Ashes.createAnalisisAshes({
+        idAnalisis: analisis.idanalisis,
+        resultado: fmt(cenizasObj.cenizasPromedio),
+        acreditacion: getAcreditacion('Cenizas')
+      });
+
+      const dietaryFiber = await DietaryFiber.createAnalisisFibra({
+        idAnalisis: analisis.idanalisis,
+        resultado: fmt(fibraObj.resultado),
+        acreditacion: getAcreditacion('Fibra dietética')
+      });
+
+      const carbohydrates = await Carbohydrates.createAnalisisCarbs({
+        idAnalisis: analisis.idanalisis,
+        resultado: fmt(carbObj.carbohidratos),
+        acreditacion: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)')
+      });
+
+      const sodium = await Sodium.createAnalisisSodium({
+        idAnalisis: analisis.idanalisis,
+        resultado: fmt(sodioObj.mg),
+        acreditacion: getAcreditacion('Sodio')
+      });
+
+      const energetic = await Energetic.createEnergetic({
+        idAnalisis: analisis.idanalisis,
+        resultadoKcal: fmt(carbObj.energiaKcal),
+        resultadoKj: fmt(carbObj.energiaKJ),
+        acreditacion: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)')
+      });
+
+      const fattyAcids = await FattyAcids.createAnalisisAcidosGrasos({
+        idAnalisis: analisis.idanalisis,
+        resultadoTrans: fmt(grasasObj.porcentajeGrasasTrans),
+        resultadoSaturadas: fmt(grasasObj.porcentajeGrasasSaturadas),
+        resultadoMonoinsaturados: fmt(grasasObj.porcentajeGrasasMonoinsaturadas),
+        resultadoPolyinsaturados: fmt(grasasObj.porcentajeGrasasPoliinsaturadas),
+        total: fmt(grasasObj.porcentajeGrasaTotal),
+        acreditacion: getAcreditacion('Perfil de ácidos grasos')
+      });
+
+
+      const fechaNewCreation = new Date();
+
+      const folav = await Folav.createFolav({
+        idAnalisis: analisis.idanalisis,
+        fechaGeneracion: fechaNewCreation
+      });
 
 
       // Mapea TODO en un SOLO objeto:
