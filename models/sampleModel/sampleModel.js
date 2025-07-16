@@ -17,25 +17,17 @@ class Muestra {
   static async createSample(data) {
     const {
       idCliente,
-      folio,
-      descripcion,
-      fechaMuestreo,
-      fechaRecepcion,
-      temperatura,
+      descripcion
     } = data;
 
     const result = await pool.query(
       `INSERT INTO muestra (
-        idCliente, folio, descripcion, fechaMuestreo, fechaRecepcion, temperatura
-      ) VALUES ($1, $2, $3, $4, $5, $6)
+        idCliente, descripcion
+      ) VALUES ($1, $2)
       RETURNING *`,
       [
         idCliente,
-        folio,
-        descripcion,
-        fechaMuestreo,
-        fechaRecepcion,
-        temperatura,
+        descripcion
       ]
     );
     return result.rows[0];
