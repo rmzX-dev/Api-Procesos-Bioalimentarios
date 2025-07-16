@@ -2,12 +2,12 @@ import pool from "../../config/db.js";
 
 class DietaryFiber {
     static async createAnalisisFibra(data) {
-        const { idAnalisis, resultado, unidad, metodoReferencia, acreditacion } = data;
+        const { idAnalisis, resultado, acreditacion } = data;
 
         const result = await pool.query(
-            `INSERT INTO analisisfibradietetica (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
-             VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-            [idAnalisis, resultado, unidad, metodoReferencia, acreditacion]
+            `INSERT INTO analisisfibradietetica (idAnalisis, resultado, acreditacion)
+             VALUES ($1, $2, $3) RETURNING *`,
+            [idAnalisis, resultado, acreditacion]
         );
 
         return result.rows[0];
