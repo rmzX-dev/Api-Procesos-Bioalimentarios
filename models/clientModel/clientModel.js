@@ -16,30 +16,18 @@ class Cliente {
 
   static async createCliente(data) {
     const {
-      nombre,
-      apellidoPaterno,
-      apellidoMaterno,
       razonSocial,
-      direccion,
-      telefono,
-      metodo,
-      acreditacion
+      direccion
     } = data;
 
     const result = await pool.query(
       `INSERT INTO clientes 
-      (nombre, apellidoPaterno, apellidoMaterno, razonSocial, direccion, telefono, metodo, acreditacion)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      (razonSocial, direccion)
+      VALUES ($1, $2)
       RETURNING *;`,
       [
-        nombre,
-        apellidoPaterno,
-        apellidoMaterno,
         razonSocial,
-        direccion,
-        telefono,
-        metodo,
-        acreditacion
+        direccion
       ]
     );
 

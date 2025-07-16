@@ -2,12 +2,12 @@ import pool from "../../config/db.js";
 
 class Proteins{
     static async createAnalisisProteins(data){
-        const { idAnalisis, resultado, unidad, metodoReferencia, acreditacion } = data;
+        const { idAnalisis, resultado, acreditacion } = data;
 
         const result = await pool.query(
-            `INSERT INTO analisisproteinas (idAnalisis, resultado, unidad, metodoReferencia, acreditacion)
-             VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-            [idAnalisis, resultado, unidad, metodoReferencia, acreditacion]
+            `INSERT INTO analisisproteinas (idAnalisis, resultado, acreditacion)
+             VALUES ($1, $2, $3) RETURNING *`,
+            [idAnalisis, resultado, acreditacion]
         );
 
         return result.rows[0];

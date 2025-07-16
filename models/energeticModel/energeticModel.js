@@ -6,17 +6,14 @@ class Energetic {
             idAnalisis,
             resultadoKcal,
             resultadoKj,
-            unidadKcal,
-            unidadKj,
-            metodoReferencia,
             acreditacion
         } = data;
 
         const result = await pool.query(
             `INSERT INTO analisisenergetico (
-                idAnalisis, resultadoKcal, resultadoKj, unidadKcal, unidadKj, metodoReferencia, acreditacion
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-            [idAnalisis, resultadoKcal, resultadoKj, unidadKcal, unidadKj, metodoReferencia, acreditacion]
+                idAnalisis, resultadoKcal, resultadoKj, acreditacion
+            ) VALUES ($1, $2, $3, $4) RETURNING *`,
+            [idAnalisis, resultadoKcal, resultadoKj, acreditacion]
         );
 
         return result.rows[0];
