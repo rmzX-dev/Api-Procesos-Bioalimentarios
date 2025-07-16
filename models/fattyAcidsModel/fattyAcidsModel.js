@@ -4,27 +4,22 @@ class FattyAcids {
     static async createAnalisisAcidosGrasos(data) {
         const {
             idAnalisis,
-            resultado,
-            unidad,
-            metodoReferencia,
-            acreditacion,
             resultadoTrans,
             resultadoSaturadas,
             resultadoMonoinsaturados,
             resultadoPolyinsaturados,
-            total
+            total,
+            acreditacion
         } = data;
 
         const result = await pool.query(
             `INSERT INTO analisisacidosgrasos (
-                idAnalisis, resultado, unidad, metodoReferencia, acreditacion,
-                resultadoTrans, resultadoSaturadas, resultadoMonoinsaturados,
-                resultadoPolyinsaturados, total
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+                idAnalisis, resultadoTrans, resultadoSaturadas, resultadoMonoinsaturados,
+                resultadoPolyinsaturados, total, acreditacion
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
             [
-                idAnalisis, resultado, unidad, metodoReferencia, acreditacion,
-                resultadoTrans, resultadoSaturadas, resultadoMonoinsaturados,
-                resultadoPolyinsaturados, total
+                idAnalisis, resultadoTrans, resultadoSaturadas, resultadoMonoinsaturados,
+                resultadoPolyinsaturados, total, acreditacion
             ]
         );
 
