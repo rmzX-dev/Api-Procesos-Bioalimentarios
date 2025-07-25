@@ -15,11 +15,11 @@ class Analisis {
   }
 
   static async createAnalisis(data) {
-    const { idMuestra, folio, temperatura } = data;
+    const { idMuestra, folio, temperatura, desviacion, analista, fechaMuestreo, fechaRecepcion, fechaInicio, fechaTermino} = data;
     const result = await pool.query(
-      `INSERT INTO analisis (idMuestra, folio, temperatura)
-       VALUES ($1, $2, $3) RETURNING *`,
-      [idMuestra, folio, temperatura]
+      `INSERT INTO analisis (idMuestra, folio, fechaMuestreo, fechaRecepcion, temperatura, desviacion, analista, fechaInicio, fechaTermino)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+      [idMuestra, folio, fechaMuestreo, fechaRecepcion, temperatura, desviacion, analista, fechaInicio, fechaTermino]
     );
     return result.rows[0];
   }
