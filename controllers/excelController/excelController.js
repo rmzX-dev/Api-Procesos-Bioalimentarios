@@ -2,18 +2,18 @@ import xlsx from "xlsx";
 //import { generatePdf } from "../../services/pdfService.js";
 import { generateWordFromTemplate } from "../../services/wordService.js";
 import { docxToPdf } from "../../services/convertService.js";
-import { generarFechaFormatoReporte } from '../../utils/fecha.js';
-import  Cliente  from "../../models/clientModel/clientModel.js";
-import  Moisture  from "../../models/moistureModel/moistureModel.js";
-import  Ashes  from "../../models/ashesModel/ashesModel.js";
-import  Carbohydrates  from "../../models/carbohydratesModel/carbohydratesModel.js";
-import  DietaryFiber  from "../../models/dietaryFiberModel/dietaryFiberModel.js";
-import  Energetic  from "../../models/energeticModel/energeticModel.js";
-import  FattyAcids  from "../../models/fattyAcidsModel/fattyAcidsModel.js";
-import  Proteins  from "../../models/proteinsModel/proteinsModel.js";
-import  Sodium  from "../../models/sodiumModel/sodiumModel.js";
-import  Analisis  from "../../models/analysisModel/analysisModel.js";
-import  Muestra  from "../../models/sampleModel/sampleModel.js";
+import { generarFechaFormatoReporte, formatearFechaCorta} from '../../utils/fecha.js';
+import Cliente from "../../models/clientModel/clientModel.js";
+import Moisture from "../../models/moistureModel/moistureModel.js";
+import Ashes from "../../models/ashesModel/ashesModel.js";
+import Carbohydrates from "../../models/carbohydratesModel/carbohydratesModel.js";
+import DietaryFiber from "../../models/dietaryFiberModel/dietaryFiberModel.js";
+import Energetic from "../../models/energeticModel/energeticModel.js";
+import FattyAcids from "../../models/fattyAcidsModel/fattyAcidsModel.js";
+import Proteins from "../../models/proteinsModel/proteinsModel.js";
+import Sodium from "../../models/sodiumModel/sodiumModel.js";
+import Analisis from "../../models/analysisModel/analysisModel.js";
+import Muestra from "../../models/sampleModel/sampleModel.js";
 import Folav from "../../models/folavModel/folavModel.js";
 
 
@@ -24,7 +24,7 @@ class ExcelController {
       const datosFormulario = req.body;
       const format = req.body.format;
 
-      //console.log(datosFormulario);
+      console.log(datosFormulario);
 
       if (!archivos?.length) {
         return res.status(400).json({ mensaje: "No se enviaron archivos." });
@@ -46,6 +46,7 @@ class ExcelController {
 
         const folio = findValue(rows, "FOLIO DE LA MUESTRA:");
         const descripcion = findValue(rows, "DESCRIPCIÓN DE LA MUESTRA:");
+        const analista = findValue(rows, "ANALISTA:");
 
         const promedios = [];
         const headerIdx = rows.findIndex(r =>
@@ -61,7 +62,10 @@ class ExcelController {
           }
         }
 
-        return { folio, descripcion, promediosHumedad: promedios };
+        console.log('Humedad parsed:', { folio, descripcion, analista, promediosHumedad: promedios });
+
+
+        return { folio, descripcion, analista, promediosHumedad: promedios };
       }
 
 
@@ -359,7 +363,9 @@ class ExcelController {
  *   muestra: string|null,
  *   carbohidratos: string|number|null,
  *   energiaKcal:    string|number|null,
- *   energiaKJ:      string|number|null
+ *   energiaKJ:      string|number|null,
+ *   azucares: number|null,
+ *   azucaresAñadidos: boolean|null
  * }}
  */
       function parseCarbsAndEnergy(buffer) {
@@ -411,7 +417,22 @@ class ExcelController {
           // si algo falla, dejamos los valores en null
         }
 
-        return { folio, muestra, carbohidratos, energiaKcal, energiaKJ };
+        // — 3) Azúcares y azúcares añadidos —
+        let azucares = null;
+        let azucaresAnidados = null;
+
+        const flatText = rows.flat().map(normalize);
+
+        const sinAzucaresTexto = flatText.some(t =>
+          t.includes("SIN AZUCARES AÑADIDOS") || t.includes("NO DETECTABLE")
+        );
+
+        if (sinAzucaresTexto) {
+          azucares = 0;
+          azucaresAnidados = false;
+        }
+
+        return { folio, muestra, carbohidratos, energiaKcal, energiaKJ, azucares, azucaresAnidados };
       }
 
 
@@ -455,9 +476,9 @@ class ExcelController {
           originalname.toUpperCase().includes("CARBOHIDRATOS") ||
           flat.some(cell => cell.includes("CARBOHIDRATOS"))
         ) {
-          const { folio, muestra, carbohidratos, energiaKcal, energiaKJ } =
+          const { folio, muestra, carbohidratos, energiaKcal, energiaKJ, azucares, azucaresAnidados } =
             parseCarbsAndEnergy(buffer);
-          return { nombre: originalname, folio, muestra, carbohidratos, energiaKcal, energiaKJ };
+          return { nombre: originalname, folio, muestra, carbohidratos, energiaKcal, energiaKJ, azucares, azucaresAnidados };
         }
 
 
@@ -505,7 +526,7 @@ class ExcelController {
         return { nombre: originalname, error: "Formato no soportado" };
       });
 
-      //console.log(">>> resultados:", resultados);
+      console.log(">>> resultados:", resultados);
 
       const detalles = JSON.parse(req.body.detalles);
       //console.log(detalles);
@@ -535,6 +556,10 @@ class ExcelController {
 
       //crear una const para almaacenar lo que me retorne la funcion de utils/fecha.js
       const fechaCreacion = generarFechaFormatoReporte();
+      const DM = formatearFechaCorta(datosFormulario.fechaMuestreo);
+      const DR = formatearFechaCorta(datosFormulario.fechaRecepcion);
+      const DI = formatearFechaCorta(datosFormulario.fechaInicio);
+      const DT = formatearFechaCorta(datosFormulario.fechaTermino);
 
       // helper para dos decimales
       const fmt = num => typeof num === "number"
@@ -557,12 +582,18 @@ class ExcelController {
       const analisis = await Analisis.createAnalisis({
         idMuestra: muestra.idmuestra,
         folio: humedadObj.folio,
-        temperatura: datosFormulario.temperatura
+        temperatura: datosFormulario.temperatura,
+        desviacion: datosFormulario.desviaciones,
+        analista: humedadObj.analista,
+        fechaMuestreo: datosFormulario.fechaMuestreo,
+        fechaRecepcion: datosFormulario.fechaRecepcion,
+        fechaInicio: datosFormulario.fechaInicio,
+        fechaTermino: datosFormulario.fechaTermino
       });
 
       const moisture = await Moisture.createMoisture({
         idAnalisis: analisis.idanalisis,
-        resultado:  fmt(humedadObj.promediosHumedad[0]),
+        resultado: fmt(humedadObj.promediosHumedad[0]),
         acreditacion: getAcreditacion('Humedad')
       });
 
@@ -600,6 +631,8 @@ class ExcelController {
         idAnalisis: analisis.idanalisis,
         resultadoKcal: fmt(carbObj.energiaKcal),
         resultadoKj: fmt(carbObj.energiaKJ),
+        azucares: fmt(carbObj.azucares),
+        azucaresAnidados: fmt(carbObj.azucaresAnidados),
         acreditacion: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)')
       });
 
@@ -630,6 +663,11 @@ class ExcelController {
         direccion: datosFormulario.direccion,
         temperatura: datosFormulario.temperatura,
         desviaciones: datosFormulario.desviaciones,
+        DM: DM,
+        DR: DR,
+        DI: DI,
+        DT: DT,
+        analista: humedadObj.analista,
         fecha: fechaCreacion,
 
         valorH: fmt(humedadObj.promediosHumedad[0]),
