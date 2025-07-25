@@ -1,6 +1,7 @@
 import Folav from "../../models/folavModel/folavModel.js";
 import { generateWordFromTemplate } from "../../services/wordService.js";
 import { docxToPdf } from "../../services/convertService.js";
+import { formatearFechaCorta, generarFechaFormatoReporte } from '../../utils/fecha.js';
 
 class FolavController {
 
@@ -22,6 +23,11 @@ class FolavController {
             }
 
             console.log(folav);
+            const fecha = generarFechaFormatoReporte(new Date(folav.folav_fecha));
+            const DM = formatearFechaCorta(folav.fechamuestreo);     
+            const DR = formatearFechaCorta(folav.fecharecepcion);    
+            const DI = formatearFechaCorta(folav.fechainicio);        
+            const DT = formatearFechaCorta(folav.fechatermino);    
 
             // 2) Genera el Buffer (DOCX o PDF)
             const fmt = (v) => {
@@ -37,9 +43,15 @@ class FolavController {
                 folio: folav.folio,
                 nombreMuestrta: folav.muestra_descripcion,
                 razonSocial: folav.cliente_razon_social,
-                fechaCreacion: folav.folav_fecha.toISOString().slice(0, 10),
                 temperatura: folav.temperatura,
                 direccion: folav.cliente_direccion,
+                fecha: fecha,
+                desviaciones: folav.desviacion,
+                DM: DM,
+                DR: DR,
+                DI: DI,
+                DT: DT,
+                analista: folav.analista,
 
                 // Valores numéricos redondeados a 2 decimales
                 valorH: fmt(folav.humedad_resultado),
