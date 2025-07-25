@@ -42,8 +42,10 @@ CREATE TABLE analisis (
     fechaMuestreo DATE NOT NULL,
     fechaRecepcion DATE NOT NULL,
     temperatura DECIMAL(5,2) NOT NULL,
-    nombreAnalista VARCHAR(100) NOT NULL,
     desviacion VARCHAR(30) NOT NULL,
+    analista VARCHAR(100) NOT NULL,
+    fechaInicio DATE NOT NULL,
+    fechaTermino DATE NOT NULL,
     FOREIGN KEY (idMuestra) REFERENCES muestra(idMuestra) ON DELETE CASCADE
 );
 
