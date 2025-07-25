@@ -134,8 +134,7 @@ CREATE TABLE folav (
     idHistorial SERIAL PRIMARY KEY,
     idAnalisis INTEGER NOT NULL,
     fechaGeneracion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE,
-    FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario) ON DELETE CASCADE
+    FOREIGN KEY (idAnalisis) REFERENCES analisis(idAnalisis) ON DELETE CASCADE
 );
 
 -- Tabla de Contenido Nutrimental
