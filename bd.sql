@@ -150,6 +150,86 @@ CREATE TABLE contenidoNutrimental (
     FOREIGN KEY (idUsuario) REFERENCES usuarios(idUsuario) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS ingredientes_combinados (
+    id_ingrediente_combinado SERIAL PRIMARY KEY,
+    id_muestra INTEGER NOT NULL, -- Clave foránea a la tabla 'muestra' (Producto Base)
+    nombre_ingrediente VARCHAR(255) NOT NULL,
+    cantidad_ml_g NUMERIC(8,2) NOT NULL, -- Cantidad específica añadida (ej. 200 ml, 50 g)
+    unidad_cantidad VARCHAR(10) NOT NULL, -- Unidad de la cantidad (ej. 'ml', 'g')
+
+    -- Perfil nutrimental del ingrediente por 100g o 100ml (como se obtendría de su propia ficha técnica)
+    energia_kcal_100 NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    proteina_g_100 NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    grasas_total_g_100 NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    grasas_saturadas_g_100 NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    grasas_trans_g_100 NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    hidratos_carbono_g_100 NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    azucares_g_100 NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    azucares_aniadidos_g_100 NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    fibra_dietetica_g_100 NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    sodio_mg_100 NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+
+    FOREIGN KEY (id_muestra) REFERENCES muestra(idMuestra) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS declaracion_nutrimental_final (
+    id_declaracion SERIAL PRIMARY KEY,
+    id_muestra INTEGER NOT NULL,                  -- Clave foránea a la tabla 'muestra' (Producto Base)
+    id_ingrediente_combinado INTEGER,             -- Clave foránea al ingrediente combinado (puede ser NULL si no se combinó)
+    fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha y hora de la generación de esta declaración
+
+    -- Datos de la porción final tal como se ingresaron en el formulario
+    tamano_porcion_final NUMERIC(8,2) NOT NULL,
+    unidad_porcion_final VARCHAR(10) NOT NULL, -- 'ml' o 'g'
+    porciones_por_envase NUMERIC(8,2) NOT NULL,
+
+    -- Valores nutricionales CALCULADOS para el PRODUCTO COMBINADO FINAL, por 100g o 100ml
+    -- Estos son los que se usarían para la columna "Por 100g o 100ml" y para la evaluación de sellos
+    energia_kcal_100_combinado NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    energia_kj_100_combinado NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    proteina_g_100_combinado NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    grasas_totales_g_100_combinado NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    grasas_saturadas_g_100_combinado NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    grasas_trans_g_100_combinado NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    hidratos_carbono_g_100_combinado NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    azucares_g_100_combinado NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    azucares_aniadidos_g_100_combinado NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    fibra_g_100_combinado NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    sodio_mg_100_combinado NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+
+    -- Valores nutricionales CALCULADOS para el PRODUCTO COMBINADO FINAL, por PORCIÓN PREPARADA
+    -- Estos son los que se usarían para la columna "Por porción preparada"
+    energia_kcal_porcion NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    energia_kj_porcion NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    proteina_g_porcion NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    grasas_totales_g_porcion NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    grasas_saturadas_g_porcion NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    grasas_trans_g_porcion NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    hidratos_carbono_g_porcion NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    azucares_g_porcion NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    azucares_aniadidos_g_porcion NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    fibra_g_porcion NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    sodio_mg_porcion NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+
+    -- Contenido energético total por envase
+    contenido_energetico_envase_kcal NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+    contenido_energetico_envase_kj NUMERIC(8,2) NOT NULL DEFAULT 0.00,
+
+    -- Banderas booleanas para los sellos de advertencia
+    exceso_calorias BOOLEAN DEFAULT FALSE,
+    exceso_azucares BOOLEAN DEFAULT FALSE,
+    exceso_grasas_saturadas BOOLEAN DEFAULT FALSE,
+    exceso_grasas_trans BOOLEAN DEFAULT FALSE,
+    exceso_sodio BOOLEAN DEFAULT FALSE,
+
+    -- Campo para almacenar leyendas adicionales (ej. "Contiene edulcorantes")
+    leyendas_adicionales TEXT,
+
+    FOREIGN KEY (id_muestra) REFERENCES muestra(idMuestra) ON DELETE CASCADE,
+    FOREIGN KEY (id_ingrediente_combinado) REFERENCES ingredientes_combinados(id_ingrediente_combinado) ON DELETE SET NULL -- Si se elimina el ingrediente, no se borra la declaración
+);
+
 -- Índices para mejorar el rendimiento
 CREATE INDEX idx_muestra_idcliente ON muestra(idCliente);
 CREATE INDEX idx_analisis_idmuestra ON analisis(idMuestra);
@@ -205,6 +285,8 @@ LEFT JOIN analisisacidosgrasos aag ON aag.idAnalisis = a.idAnalisis
 LEFT JOIN folav f ON f.idAnalisis = a.idAnalisis
 
 WHERE a.idAnalisis = 4;
+
+
 
 SELECT * FROM folav;
 
