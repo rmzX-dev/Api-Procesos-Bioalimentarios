@@ -13,6 +13,27 @@ class Folav {
     return result.rows[0];
   }
 
+   static async updateFolav(idAnalisis, data) {
+        const { fechaGeneracion } = data; // Puedes añadir más campos si el Folav tiene más que actualizar
+        const result = await pool.query(
+            `UPDATE folav SET
+            fechaGeneracion = $1
+            WHERE idAnalisis = $2
+            RETURNING *`,
+            [fechaGeneracion, idAnalisis]
+        );
+        return result.rows[0]; // Retorna el Folav actualizado
+    }
+
+
+     static async getFolavByAnalisisId(idAnalisis) {
+        const result = await pool.query(
+            'SELECT * FROM folav WHERE idAnalisis = $1',
+            [idAnalisis]
+        );
+        return result.rows[0]; // Retorna el Folav asociado al idAnalisis o undefined/null
+    }
+
 
   static async getFolavs() {
     const result = await pool.query(`
@@ -99,6 +120,57 @@ WHERE a.idAnalisis = $1;`,
       [idFolab]
     );
     return result.rows[0];
+  }
+
+
+  static async getInfoByFolio(folio){
+    const result = await pool.query(
+      `SELECT
+    m.idMuestra AS id_muestra,
+    m.descripcion AS muestra_descripcion,
+    a.folio AS analisis_folio,
+    a.analista AS analisis_analista,
+    ap.resultado AS proteinas_resultado,
+    afd.resultado AS fibra_resultado,
+    aca.resultado AS carbohidratos_resultado,
+    aso.resultado AS sodio_resultado,
+    ae.resultadoKcal AS energetico_kcal,
+    ae.resultadoKj AS energetico_kj,
+    ae.azucares AS azucares,
+    ae.azucaresAnidados AS azucares_anidados,
+    aag.resultadoTrans AS grasas_trans,
+    aag.resultadoSaturadas AS grasas_saturadas,
+    aag.total AS grasas_total
+FROM
+    analisis a
+INNER JOIN
+    muestra m ON a.idmuestra = m.idmuestra 
+INNER JOIN
+    clientes c ON m.idcliente = c.idcliente 
+LEFT JOIN
+    analisishumedad ah ON a.idanalisis = ah.idanalisis 
+LEFT JOIN
+    analisisproteinas ap ON a.idanalisis = ap.idanalisis
+LEFT JOIN
+    analisiscenizas ac ON a.idanalisis = ac.idanalisis
+LEFT JOIN
+    analisisfibradietetica afd ON a.idanalisis = afd.idanalisis 
+LEFT JOIN
+    analisiscarbohidratos aca ON a.idanalisis = aca.idanalisis 
+LEFT JOIN
+    analisissodio aso ON a.idanalisis = aso.idanalisis
+LEFT JOIN
+    analisisenergetico ae ON a.idanalisis = ae.idanalisis 
+LEFT JOIN
+    analisisacidosgrasos aag ON a.idanalisis = aag.idanalisis 
+LEFT JOIN
+    folav f ON a.idanalisis = f.idanalisis 
+
+WHERE
+    a.folio = $1;`, [folio]
+    );
+
+    return result.rows.length ? result.rows[0] : null;
   }
 }
 
