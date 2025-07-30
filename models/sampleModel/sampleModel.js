@@ -34,6 +34,32 @@ class Muestra {
   }
 
 
+  static async updateSample(idMuestra, data) {
+        const { idCliente, descripcion } = data; // O más campos si los tienes
+
+        const result = await pool.query(
+            `UPDATE muestra SET
+            idCliente = $1,
+            descripcion = $2
+            WHERE idMuestra = $3
+            RETURNING *;`,
+            [
+                idCliente,
+                descripcion,
+                idMuestra
+            ]
+        );
+        return result.rows[0]; // Devuelve la muestra actualizada
+    }
+
+    static async getSampleByClienteAndDescription(idCliente, descripcion) {
+        const result = await pool.query(
+            "SELECT * FROM muestra WHERE idCliente = $1 AND descripcion = $2",
+            [idCliente, descripcion]
+        );
+        return result.rows[0];
+    }
+
 }
 
 export default Muestra;

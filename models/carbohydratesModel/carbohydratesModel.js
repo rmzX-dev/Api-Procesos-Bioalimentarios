@@ -13,7 +13,7 @@ class Carbohydrates {
         return result.rows[0];
     }
 
-    static async getCarbsById(idAnalisis) {
+    static async getCarbsByAnalisisId(idAnalisis) {
         const result = await pool.query(
             'SELECT * FROM analisiscarbohidratos WHERE idAnalisis = $1',
             [idAnalisis]
@@ -26,6 +26,21 @@ class Carbohydrates {
             'SELECT * FROM analisiscarbohidratos'
         );
         return result.rows;
+    }
+
+
+     // Nuevo método: Actualizar un registro de carbohidratos existente
+    static async updateAnalisisCarbs(idAnalisis, data) {
+        const { resultado, acreditacion } = data;
+        const result = await pool.query(
+            `UPDATE analisiscarbohidratos SET
+            resultado = $1,
+            acreditacion = $2
+            WHERE idAnalisis = $3
+            RETURNING *;`,
+            [resultado, acreditacion, idAnalisis]
+        );
+        return result.rows[0];
     }
 }
 

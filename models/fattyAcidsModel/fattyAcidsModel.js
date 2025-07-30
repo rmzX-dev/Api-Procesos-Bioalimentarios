@@ -26,7 +26,7 @@ class FattyAcids {
         return result.rows[0];
     }
 
-    static async getAcidosGrasosById(idAnalisis) {
+    static async getFattyAcidsByAnalisisId(idAnalisis) {
         const result = await pool.query(
             'SELECT * FROM analisisacidosgrasos WHERE idAnalisis = $1',
             [idAnalisis]
@@ -39,6 +39,40 @@ class FattyAcids {
             'SELECT * FROM analisisacidosgrasos'
         );
         return result.rows;
+    }
+
+     // Nuevo método: Actualizar un registro de ácidos grasos existente
+    static async updateAnalisisAcidosGrasos(idAnalisis, data) {
+        const {
+            resultadoTrans,
+            resultadoSaturadas,
+            resultadoMonoinsaturados,
+            resultadoPolyinsaturados,
+            total,
+            acreditacion
+        } = data;
+
+        const result = await pool.query(
+            `UPDATE analisisacidosgrasos SET
+            resultadoTrans = $1,
+            resultadoSaturadas = $2,
+            resultadoMonoinsaturados = $3,
+            resultadoPolyinsaturados = $4,
+            total = $5,
+            acreditacion = $6
+            WHERE idAnalisis = $7
+            RETURNING *;`,
+            [
+                resultadoTrans,
+                resultadoSaturadas,
+                resultadoMonoinsaturados,
+                resultadoPolyinsaturados,
+                total,
+                acreditacion,
+                idAnalisis
+            ]
+        );
+        return result.rows[0];
     }
 }
 

@@ -110,6 +110,19 @@ class FolavController {
         }
     }
 
+    static async getInfoByFolio(req, res){
+        try{
+            const folio = req.params.folio;
+            const allAnalisisData  = await Folav.getInfoByFolio(folio);
+            if(!allAnalisisData ){
+                return res.status(404).json({ message: "Folio no encontrado." });
+            }
+            res.json(allAnalisisData);
+        }catch(error){
+            res.status(500).json({ error: error.message });
+        }
+    }
+
     static async deleteFolav(req, res) {
         const { id } = req.params;
 

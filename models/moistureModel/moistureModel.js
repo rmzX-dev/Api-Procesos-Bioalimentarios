@@ -13,10 +13,25 @@ class Moisture {
         return result.rows[0];
     }
 
-    static async getMoistureById(idAnalisis){
+    static async getMoistureByAnalisisId(idAnalisis){
         const result = await pool.query(
             'SELECT * FROM analisishumedad WHERE idAnalisis = $1',
             [idAnalisis]
+        );
+        return result.rows[0];
+    }
+
+    // Nuevo método: Actualizar un registro de humedad existente
+    static async updateMoisture(idAnalisis, data) {
+        const { resultado, acreditacion } = data;
+
+        const result = await pool.query(
+            `UPDATE analisishumedad SET
+            resultado = $1,
+            acreditacion = $2
+            WHERE idAnalisis = $3
+            RETURNING *;`,
+            [resultado, acreditacion, idAnalisis]
         );
         return result.rows[0];
     }

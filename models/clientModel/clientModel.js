@@ -34,6 +34,28 @@ class Cliente {
     return result.rows[0];
   }
 
+  static async getClienteByRazonSocial(razonSocial) {
+        const result = await pool.query(
+            'SELECT * FROM clientes WHERE "razonsocial" = $1',
+            [razonSocial]
+        );
+        return result.rows[0];
+    }
+
+  
+    static async updateCliente(idCliente, data) {
+        const { razonSocial, direccion } = data;
+        const result = await pool.query(
+            `UPDATE clientes SET
+            "razonsocial" = $1,
+            direccion = $2
+            WHERE idcliente = $3
+            RETURNING *;`,
+            [razonSocial, direccion, idCliente]
+        );
+        return result.rows[0];
+    }
+
 }
 
 export default Cliente;
