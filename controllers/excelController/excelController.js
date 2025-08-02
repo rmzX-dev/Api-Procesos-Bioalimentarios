@@ -2,7 +2,7 @@ import xlsx from "xlsx";
 //import { generatePdf } from "../../services/pdfService.js";
 import { generateWordFromTemplate } from "../../services/wordService.js";
 import { docxToPdf } from "../../services/convertService.js";
-import { generarFechaFormatoReporte, formatearFechaCorta} from '../../utils/fecha.js';
+import { generarFechaFormatoReporte, formatearFechaCorta } from '../../utils/fecha.js';
 import Cliente from "../../models/clientModel/clientModel.js";
 import Moisture from "../../models/moistureModel/moistureModel.js";
 import Ashes from "../../models/ashesModel/ashesModel.js";
@@ -22,7 +22,7 @@ class ExcelController {
     let cliente;
     let muestra;
     let analisis;
-    
+
     try {
       const archivos = req.files;
       const datosFormulario = req.body;
@@ -570,24 +570,35 @@ class ExcelController {
         ? parseFloat(num.toFixed(2))
         : num;
 
-      
+      const folioUnique = humedadObj.folio;
+      const analysis = await Analisis.getAnalisisByFolio(folioUnique);
+
+      if (analysis) {
+        console.log(`[Analisis] El análisis con folio ${folioUnique} ya existe. Abortando.`);
+        return res.status(409).json({
+          message: `El folio ${folioUnique} ya ha sido registrado.`
+        });
+      }
+
+
+
       cliente = await Cliente.getClienteByRazonSocial(datosFormulario.nombre);
 
-       if (cliente) {
-            // Cliente encontrado, usar su ID. Opcional: actualizar dirección si ha cambiado
-            console.log(`[Cliente] Cliente "${cliente.razonsocial}" ya existe. Usando ID: ${cliente.idcliente}.`);
-            if (cliente.direccion !== datosFormulario.direccion) {
-                cliente = await Cliente.updateCliente(cliente.idcliente, cliente.razonsocial, cliente.direccion);
-                console.log(`[Cliente] Dirección de "${razonSocialCliente}" actualizada.`);
-            }
-        } else {
-            // Cliente no encontrado, crear uno nuevo
-            console.log(`[Cliente] Cliente "${datosFormulario.nombre}" no existe. Creando nuevo cliente.`);
-            cliente = await Cliente.createCliente({
-                razonSocial: datosFormulario.nombre,
-                direccion: datosFormulario.direccion
-            });
+      if (cliente) {
+        // Cliente encontrado, usar su ID. Opcional: actualizar dirección si ha cambiado
+        console.log(`[Cliente] Cliente "${cliente.razonsocial}" ya existe. Usando ID: ${cliente.idcliente}.`);
+        if (cliente.direccion !== datosFormulario.direccion) {
+          cliente = await Cliente.updateCliente(cliente.idcliente, cliente.razonsocial, cliente.direccion);
+          console.log(`[Cliente] Dirección de "${razonSocialCliente}" actualizada.`);
         }
+      } else {
+        // Cliente no encontrado, crear uno nuevo
+        console.log(`[Cliente] Cliente "${datosFormulario.nombre}" no existe. Creando nuevo cliente.`);
+        cliente = await Cliente.createCliente({
+          razonSocial: datosFormulario.nombre,
+          direccion: datosFormulario.direccion
+        });
+      }
 
       //console.log(cliente);
 
@@ -596,206 +607,206 @@ class ExcelController {
       muestra = await Muestra.getSampleByClienteAndDescription(cliente.idcliente, descripcionMuestra);
 
       if (muestra) {
-            // Muestra encontrada, usar su ID. Opcional: actualizar otros campos si es necesario
-            console.log(`[Muestra] Muestra "${descripcionMuestra}" para cliente ${cliente.idcliente} ya existe. Usando ID: ${muestra.idmuestra}.`);
-            // Si tienes un método updateSample y necesitas actualizar otros campos de la muestra:
-            muestra = await Muestra.updateSample(muestra.idmuestra, { idCliente: cliente.idcliente, descripcion: descripcionMuestra, /* otros campos */ });
-        } else {
-            // Muestra no encontrada, crear una nueva
-            console.log(`[Muestra] Muestra "${descripcionMuestra}" para cliente ${cliente.idcliente} no existe. Creando nueva muestra.`);
-            muestra = await Muestra.createSample({
-                idCliente: cliente.idcliente,
-                descripcion: descripcionMuestra
-            });
-        }
+        // Muestra encontrada, usar su ID. Opcional: actualizar otros campos si es necesario
+        console.log(`[Muestra] Muestra "${descripcionMuestra}" para cliente ${cliente.idcliente} ya existe. Usando ID: ${muestra.idmuestra}.`);
+        // Si tienes un método updateSample y necesitas actualizar otros campos de la muestra:
+        muestra = await Muestra.updateSample(muestra.idmuestra, { idCliente: cliente.idcliente, descripcion: descripcionMuestra, /* otros campos */ });
+      } else {
+        // Muestra no encontrada, crear una nueva
+        console.log(`[Muestra] Muestra "${descripcionMuestra}" para cliente ${cliente.idcliente} no existe. Creando nueva muestra.`);
+        muestra = await Muestra.createSample({
+          idCliente: cliente.idcliente,
+          descripcion: descripcionMuestra
+        });
+      }
 
-      
+
       const folioAnalisis = humedadObj.folio;
 
       analisis = await Analisis.getAnalisisByFolio(folioAnalisis);
 
-       const analisisData = {
-            idMuestra: muestra.idmuestra,
-            folio: folioAnalisis,
-            temperatura: datosFormulario.temperatura,
-            desviacion: datosFormulario.desviaciones,
-            analista: humedadObj.analista,
-            fechaMuestreo: datosFormulario.fechaMuestreo,
-            fechaRecepcion: datosFormulario.fechaRecepcion,
-            fechaInicio: datosFormulario.fechaInicio,
-            fechaTermino: datosFormulario.fechaTermino
-        };
+      const analisisData = {
+        idMuestra: muestra.idmuestra,
+        folio: folioAnalisis,
+        temperatura: datosFormulario.temperatura,
+        desviacion: datosFormulario.desviaciones,
+        analista: humedadObj.analista,
+        fechaMuestreo: datosFormulario.fechaMuestreo,
+        fechaRecepcion: datosFormulario.fechaRecepcion,
+        fechaInicio: datosFormulario.fechaInicio,
+        fechaTermino: datosFormulario.fechaTermino
+      };
 
-        if (analisis) {
-            // Análisis encontrado, actualizarlo
-            console.log(`[Analisis] Análisis con folio ${folioAnalisis} ya existe. Actualizando...`);
-            analisis = await Analisis.updateAnalisis(analisis.idanalisis, analisisData);
-        } else {
-            // Análisis no encontrado, crear uno nuevo
-            console.log(`[Analisis] Creando nuevo análisis con folio ${folioAnalisis}.`);
-            analisis = await Analisis.createAnalisis(analisisData);
-        }
+      if (analisis) {
+        // Análisis encontrado, actualizarlo
+        console.log(`[Analisis] Análisis con folio ${folioAnalisis} ya existe. Actualizando...`);
+        analisis = await Analisis.updateAnalisis(analisis.idanalisis, analisisData);
+      } else {
+        // Análisis no encontrado, crear uno nuevo
+        console.log(`[Analisis] Creando nuevo análisis con folio ${folioAnalisis}.`);
+        analisis = await Analisis.createAnalisis(analisisData);
+      }
 
       const moistureResult = await Moisture.getMoistureByAnalisisId(analisis.idanalisis);
-      
+
       if (moistureResult) {
-            console.log(`[Humedad] Actualizando análisis de humedad para ${analisis.idanalisis}.`);
-            await Moisture.updateMoisture(analisis.idanalisis, {
-                resultado: fmt(humedadObj.promediosHumedad[0]),
-                acreditacion: getAcreditacion('Humedad')
-            });
-        } else {
-            console.log(`[Humedad] Creando análisis de humedad para ${analisis.idanalisis}.`);
-            await Moisture.createMoisture({
-                idAnalisis: analisis.idanalisis,
-                resultado: fmt(humedadObj.promediosHumedad[0]),
-                acreditacion: getAcreditacion('Humedad')
-            });
-        }
+        console.log(`[Humedad] Actualizando análisis de humedad para ${analisis.idanalisis}.`);
+        await Moisture.updateMoisture(analisis.idanalisis, {
+          resultado: fmt(humedadObj.promediosHumedad[0]),
+          acreditacion: getAcreditacion('Humedad')
+        });
+      } else {
+        console.log(`[Humedad] Creando análisis de humedad para ${analisis.idanalisis}.`);
+        await Moisture.createMoisture({
+          idAnalisis: analisis.idanalisis,
+          resultado: fmt(humedadObj.promediosHumedad[0]),
+          acreditacion: getAcreditacion('Humedad')
+        });
+      }
 
       const proteinsResult = await Proteins.getProteinsByAnalisisId(analisis.idanalisis);
       if (proteinsResult) {
-            console.log(`[Proteínas] Actualizando análisis de proteínas para ${analisis.idanalisis}.`);
-            await Proteins.updateAnalisisProteins(analisis.idanalisis, {
-                resultado: fmt(proteinaObj.proteina),
-                acreditacion: getAcreditacion('Proteínas')
-            });
-        } else {
-            console.log(`[Proteínas] Creando análisis de proteínas para ${analisis.idanalisis}.`);
-            await Proteins.createAnalisisProteins({
-                idAnalisis: analisis.idanalisis,
-                resultado: fmt(proteinaObj.proteina),
-                acreditacion: getAcreditacion('Proteínas')
-            });
-        }
+        console.log(`[Proteínas] Actualizando análisis de proteínas para ${analisis.idanalisis}.`);
+        await Proteins.updateAnalisisProteins(analisis.idanalisis, {
+          resultado: fmt(proteinaObj.proteina),
+          acreditacion: getAcreditacion('Proteínas')
+        });
+      } else {
+        console.log(`[Proteínas] Creando análisis de proteínas para ${analisis.idanalisis}.`);
+        await Proteins.createAnalisisProteins({
+          idAnalisis: analisis.idanalisis,
+          resultado: fmt(proteinaObj.proteina),
+          acreditacion: getAcreditacion('Proteínas')
+        });
+      }
 
       const ashesResult = await Ashes.getAshesByAnalisisId(analisis.idanalisis);
-       if (ashesResult) {
-            console.log(`[Cenizas] Actualizando análisis de cenizas para ${analisis.idanalisis}.`);
-            await Ashes.updateAnalisisAshes(analisis.idanalisis, {
-                resultado: fmt(cenizasObj.cenizasPromedio),
-                acreditacion: getAcreditacion('Cenizas')
-            });
-        } else {
-            console.log(`[Cenizas] Creando análisis de cenizas para ${analisis.idanalisis}.`);
-            await Ashes.createAnalisisAshes({
-                idAnalisis: analisis.idanalisis,
-                resultado: fmt(cenizasObj.cenizasPromedio),
-                acreditacion: getAcreditacion('Cenizas')
-            });
-        }
+      if (ashesResult) {
+        console.log(`[Cenizas] Actualizando análisis de cenizas para ${analisis.idanalisis}.`);
+        await Ashes.updateAnalisisAshes(analisis.idanalisis, {
+          resultado: fmt(cenizasObj.cenizasPromedio),
+          acreditacion: getAcreditacion('Cenizas')
+        });
+      } else {
+        console.log(`[Cenizas] Creando análisis de cenizas para ${analisis.idanalisis}.`);
+        await Ashes.createAnalisisAshes({
+          idAnalisis: analisis.idanalisis,
+          resultado: fmt(cenizasObj.cenizasPromedio),
+          acreditacion: getAcreditacion('Cenizas')
+        });
+      }
 
       const dietaryFiberResult = await DietaryFiber.getFibraByAnalisisId(analisis.idanalisis);
 
       if (dietaryFiberResult) {
-            console.log(`[Fibra] Actualizando análisis de fibra para ${analisis.idanalisis}.`);
-            await DietaryFiber.updateAnalisisFibra(analisis.idanalisis, {
-                resultado: fmt(fibraObj.resultado),
-                acreditacion: getAcreditacion('Fibra dietética')
-            });
-        } else {
-            console.log(`[Fibra] Creando análisis de fibra para ${analisis.idanalisis}.`);
-            await DietaryFiber.createAnalisisFibra({
-                idAnalisis: analisis.idanalisis,
-                resultado: fmt(fibraObj.resultado),
-                acreditacion: getAcreditacion('Fibra dietética')
-            });
-        }
+        console.log(`[Fibra] Actualizando análisis de fibra para ${analisis.idanalisis}.`);
+        await DietaryFiber.updateAnalisisFibra(analisis.idanalisis, {
+          resultado: fmt(fibraObj.resultado),
+          acreditacion: getAcreditacion('Fibra dietética')
+        });
+      } else {
+        console.log(`[Fibra] Creando análisis de fibra para ${analisis.idanalisis}.`);
+        await DietaryFiber.createAnalisisFibra({
+          idAnalisis: analisis.idanalisis,
+          resultado: fmt(fibraObj.resultado),
+          acreditacion: getAcreditacion('Fibra dietética')
+        });
+      }
 
-      
+
       const carbohydratesResult = await Carbohydrates.getCarbsByAnalisisId(analisis.idanalisis);
       if (carbohydratesResult) {
-            console.log(`[Carbohidratos] Actualizando análisis de carbohidratos para ${analisis.idanalisis}.`);
-            await Carbohydrates.updateAnalisisCarbs(analisis.idanalisis, {
-                resultado: fmt(carbObj.carbohidratos),
-                acreditacion: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)')
-            });
-        } else {
-            console.log(`[Carbohidratos] Creando análisis de carbohidratos para ${analisis.idanalisis}.`);
-            await Carbohydrates.createAnalisisCarbs({
-                idAnalisis: analisis.idanalisis,
-                resultado: fmt(carbObj.carbohidratos),
-                acreditacion: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)')
-            });
-        }
+        console.log(`[Carbohidratos] Actualizando análisis de carbohidratos para ${analisis.idanalisis}.`);
+        await Carbohydrates.updateAnalisisCarbs(analisis.idanalisis, {
+          resultado: fmt(carbObj.carbohidratos),
+          acreditacion: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)')
+        });
+      } else {
+        console.log(`[Carbohidratos] Creando análisis de carbohidratos para ${analisis.idanalisis}.`);
+        await Carbohydrates.createAnalisisCarbs({
+          idAnalisis: analisis.idanalisis,
+          resultado: fmt(carbObj.carbohidratos),
+          acreditacion: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)')
+        });
+      }
 
       const sodiumResult = await Sodium.getSodiumByAnalisisId(analisis.idanalisis);
       if (sodiumResult) {
-            console.log(`[Sodio] Actualizando análisis de sodio para ${analisis.idanalisis}.`);
-            await Sodium.updateAnalisisSodium(analisis.idanalisis, {
-                resultado: fmt(sodioObj.mg),
-                acreditacion: getAcreditacion('Sodio')
-            });
-        } else {
-            console.log(`[Sodio] Creando análisis de sodio para ${analisis.idanalisis}.`);
-            await Sodium.createAnalisisSodium({
-                idAnalisis: analisis.idanalisis,
-                resultado: fmt(sodioObj.mg),
-                acreditacion: getAcreditacion('Sodio')
-            });
-        }
+        console.log(`[Sodio] Actualizando análisis de sodio para ${analisis.idanalisis}.`);
+        await Sodium.updateAnalisisSodium(analisis.idanalisis, {
+          resultado: fmt(sodioObj.mg),
+          acreditacion: getAcreditacion('Sodio')
+        });
+      } else {
+        console.log(`[Sodio] Creando análisis de sodio para ${analisis.idanalisis}.`);
+        await Sodium.createAnalisisSodium({
+          idAnalisis: analisis.idanalisis,
+          resultado: fmt(sodioObj.mg),
+          acreditacion: getAcreditacion('Sodio')
+        });
+      }
 
-      
+
       const energeticResult = await Energetic.getEnergeticByAnalisisId(analisis.idanalisis);
       if (energeticResult) {
-            console.log(`[Energético] Actualizando análisis energético para ${analisis.idanalisis}.`);
-            await Energetic.updateEnergetic(analisis.idanalisis, {
-                resultadoKcal: fmt(carbObj.energiaKcal),
-                resultadoKj: fmt(carbObj.energiaKJ),
-                azucares: fmt(carbObj.azucares),
-                azucaresAnidados: fmt(carbObj.azucaresAnidados),
-                acreditacion: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)') // Asegúrate de que esta acreditación sea la correcta para Energético
-            });
-        } else {
-            console.log(`[Energético] Creando análisis energético para ${analisis.idanalisis}.`);
-            await Energetic.createEnergetic({
-                idAnalisis: analisis.idanalisis,
-                resultadoKcal: fmt(carbObj.energiaKcal),
-                resultadoKj: fmt(carbObj.energiaKJ),
-                azucares: fmt(carbObj.azucares),
-                azucaresAnidados: fmt(carbObj.azucaresAnidados),
-                acreditacion: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)') // Asegúrate de que esta acreditación sea la correcta para Energético
-            });
-        }
+        console.log(`[Energético] Actualizando análisis energético para ${analisis.idanalisis}.`);
+        await Energetic.updateEnergetic(analisis.idanalisis, {
+          resultadoKcal: fmt(carbObj.energiaKcal),
+          resultadoKj: fmt(carbObj.energiaKJ),
+          azucares: fmt(carbObj.azucares),
+          azucaresAnidados: fmt(carbObj.azucaresAnidados),
+          acreditacion: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)') // Asegúrate de que esta acreditación sea la correcta para Energético
+        });
+      } else {
+        console.log(`[Energético] Creando análisis energético para ${analisis.idanalisis}.`);
+        await Energetic.createEnergetic({
+          idAnalisis: analisis.idanalisis,
+          resultadoKcal: fmt(carbObj.energiaKcal),
+          resultadoKj: fmt(carbObj.energiaKJ),
+          azucares: fmt(carbObj.azucares),
+          azucaresAnidados: fmt(carbObj.azucaresAnidados),
+          acreditacion: getAcreditacion('Carbohidratos (Hidratos de Carbono disponibles)') // Asegúrate de que esta acreditación sea la correcta para Energético
+        });
+      }
 
-        const fattyAcidsResult = await FattyAcids.getFattyAcidsByAnalisisId(analisis.idanalisis);
-        if (fattyAcidsResult) {
-            console.log(`[Ácidos Grasos] Actualizando análisis de ácidos grasos para ${analisis.idanalisis}.`);
-            await FattyAcids.updateAnalisisAcidosGrasos(analisis.idanalisis, {
-                resultadoTrans: fmt(grasasObj.porcentajeGrasasTrans),
-                resultadoSaturadas: fmt(grasasObj.porcentajeGrasasSaturadas),
-                resultadoMonoinsaturados: fmt(grasasObj.porcentajeGrasasMonoinsaturadas),
-                resultadoPolyinsaturados: fmt(grasasObj.porcentajeGrasasPoliinsaturadas),
-                total: fmt(grasasObj.porcentajeGrasaTotal),
-                acreditacion: getAcreditacion('Perfil de ácidos grasos')
-            });
-        } else {
-            console.log(`[Ácidos Grasos] Creando análisis de ácidos grasos para ${analisis.idanalisis}.`);
-            await FattyAcids.createAnalisisAcidosGrasos({
-                idAnalisis: analisis.idanalisis,
-                resultadoTrans: fmt(grasasObj.porcentajeGrasasTrans),
-                resultadoSaturadas: fmt(grasasObj.porcentajeGrasasSaturadas),
-                resultadoMonoinsaturados: fmt(grasasObj.porcentajeGrasasMonoinsaturadas),
-                resultadoPolyinsaturados: fmt(grasasObj.porcentajeGrasasPoliinsaturadas),
-                total: fmt(grasasObj.porcentajeGrasaTotal),
-                acreditacion: getAcreditacion('Perfil de ácidos grasos')
-            });
-        }
+      const fattyAcidsResult = await FattyAcids.getFattyAcidsByAnalisisId(analisis.idanalisis);
+      if (fattyAcidsResult) {
+        console.log(`[Ácidos Grasos] Actualizando análisis de ácidos grasos para ${analisis.idanalisis}.`);
+        await FattyAcids.updateAnalisisAcidosGrasos(analisis.idanalisis, {
+          resultadoTrans: fmt(grasasObj.porcentajeGrasasTrans),
+          resultadoSaturadas: fmt(grasasObj.porcentajeGrasasSaturadas),
+          resultadoMonoinsaturados: fmt(grasasObj.porcentajeGrasasMonoinsaturadas),
+          resultadoPolyinsaturados: fmt(grasasObj.porcentajeGrasasPoliinsaturadas),
+          total: fmt(grasasObj.porcentajeGrasaTotal),
+          acreditacion: getAcreditacion('Perfil de ácidos grasos')
+        });
+      } else {
+        console.log(`[Ácidos Grasos] Creando análisis de ácidos grasos para ${analisis.idanalisis}.`);
+        await FattyAcids.createAnalisisAcidosGrasos({
+          idAnalisis: analisis.idanalisis,
+          resultadoTrans: fmt(grasasObj.porcentajeGrasasTrans),
+          resultadoSaturadas: fmt(grasasObj.porcentajeGrasasSaturadas),
+          resultadoMonoinsaturados: fmt(grasasObj.porcentajeGrasasMonoinsaturadas),
+          resultadoPolyinsaturados: fmt(grasasObj.porcentajeGrasasPoliinsaturadas),
+          total: fmt(grasasObj.porcentajeGrasaTotal),
+          acreditacion: getAcreditacion('Perfil de ácidos grasos')
+        });
+      }
 
 
       const fechaNewCreation = new Date();
 
       const folavResult = await Folav.getFolavByAnalisisId(analisis.idanalisis);
-       if (folavResult) {
-            console.log(`[Folav] Actualizando Folav para ${analisis.idanalisis}.`);
-            await Folav.updateFolav(analisis.idanalisis, { fechaGeneracion: fechaNewCreation }); // Necesitas este método en Folav.js
-        } else {
-            console.log(`[Folav] Creando Folav para ${analisis.idanalisis}.`);
-            await Folav.createFolav({
-                idAnalisis: analisis.idanalisis,
-                fechaGeneracion: fechaNewCreation
-            });
-        }
+      if (folavResult) {
+        console.log(`[Folav] Actualizando Folav para ${analisis.idanalisis}.`);
+        await Folav.updateFolav(analisis.idanalisis, { fechaGeneracion: fechaNewCreation }); // Necesitas este método en Folav.js
+      } else {
+        console.log(`[Folav] Creando Folav para ${analisis.idanalisis}.`);
+        await Folav.createFolav({
+          idAnalisis: analisis.idanalisis,
+          fechaGeneracion: fechaNewCreation
+        });
+      }
 
 
       // Mapea TODO en un SOLO objeto:
@@ -866,11 +877,11 @@ class ExcelController {
     } catch (error) {
       console.error('Error en procesarAnalisisCompleto:', error);
       console.error("Error al procesar los archivos Excel:", error);
-      
-        if (error.code === '23505' && error.constraint === 'uq_analisis_folio') {
-            return res.status(409).json({ message: 'Error: El folio del análisis ya existe. Por favor, ingrese un folio único o intente actualizar el existente.' });
-        }
-       
+
+      if (error.code === '23505' && error.constraint === 'uq_analisis_folio') {
+        return res.status(409).json({ message: 'Error: El folio del análisis ya existe. Por favor, ingrese un folio único o intente actualizar el existente.' });
+      }
+
       return res.status(500).json({ mensaje: "Error interno del servidor." });
     }
   }
