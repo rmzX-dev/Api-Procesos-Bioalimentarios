@@ -24,7 +24,7 @@ class MuestraController {
 
   static async createSample(req, res) {
     try {
-      const muestra = await Muestra.create(req.body);
+      const muestra = await Muestra.createSample(req.body);
       res.status(201).json(muestra);
     } catch (error) {
       res.status(500).json({ error: error.message });
