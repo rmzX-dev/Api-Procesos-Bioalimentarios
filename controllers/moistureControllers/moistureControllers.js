@@ -23,7 +23,7 @@ class mouistureController {
 
   static async createMoisture(req, res) {
     try {
-      const data = await Mouisture.createAnalisisHumedad(req.body);
+      const data = await Mouisture.createMoisture(req.body);
       res.status(201).json(data);
     } catch (err) {
       res.status(500).json({ error: err.message });
