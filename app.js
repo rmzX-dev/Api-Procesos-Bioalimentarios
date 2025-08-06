@@ -16,6 +16,7 @@ import sodiumRoutes from "./routes/sodiumRoutes/sodiumRoutes.js";
 import userRoutes from "./routes/userRoutes/userRoutes.js";
 import excelRoutes from "./routes/excelRoutes/excelRoutes.js";
 import folavRoutes from "./routes/folavRoutes/folavRoutes.js";
+import nutrimentalRoutes from './routes/nutrimentalRoutes/nutrimentalRoutes.js';
 import swaggerDocs from "./config/swagger.js";
 
 dotenv.config();
@@ -42,7 +43,8 @@ app.use("/api", proteinsRoutes);
 app.use("/api", sampleRoutes);
 app.use("/api", sodiumRoutes);
 app.use("/api", userRoutes);
-app.use("/api", folavRoutes)
+app.use("/api", folavRoutes);
+app.use("/api", nutrimentalRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
