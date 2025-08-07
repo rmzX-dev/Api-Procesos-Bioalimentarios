@@ -4,5 +4,8 @@ const router = Router();
 
 
 router.post('/informe', NutrimentalController.generateReportNutrimental);
+router.get('/informe/:nombreArchivo', NutrimentalController.descargarWord);
+router.get('/informe', NutrimentalController.getDocumentosNutricionales);
+router.delete('/informe/:id', NutrimentalController.deleteNutrimentalDoc);
 
 export default router;

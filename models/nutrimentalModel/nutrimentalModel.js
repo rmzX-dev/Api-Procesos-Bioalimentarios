@@ -1,4 +1,6 @@
 import db from "../../config/db.js";
+import Folav from "../folavModel/folavModel.js";
+import pool from "../../config/db.js";
 
 class NutrimentalModel {
   static async saveDeclaration(data, idMuestra) {
@@ -72,6 +74,68 @@ class NutrimentalModel {
     const result = await db.query(sql, values);
     return result.rows[0]; // Devuelve { id_declaracion_nutrimental: X }
   }
+
+  static async getAllDocumentosGenerados() {
+  const sql = `
+    SELECT *
+    FROM documentos_generados
+    WHERE eliminado = FALSE
+  `;
+
+  const result = await db.query(sql);
+  return result.rows; // Devuelve un array con los documentos no eliminados
+}
+
+ static async deleteNutrimentalDoc(idDocumento) {
+    const result = await pool.query(
+      'UPDATE documentos_generados SET eliminado = TRUE WHERE id_declaracion_nutrimental = $1 RETURNING *',
+      [idDocumento]
+    );
+    return result.rows[0];
+  }
+
+static async getInfoDocumentos(nombreArchivo){
+
+  const sql = `
+     SELECT 
+  -- Campos de documentos_generados
+  dg.id_declaracion_nutrimental,
+  dg.id_preparacion,
+  dg.nombre_archivo,
+  dg.fecha_generado,
+  dg.eliminado,
+
+  -- Campos seleccionados de informacion_preparacion (excepto id_preparacion)
+  ip.idmuestra,
+  ip.preparacion,
+  ip.cekc_100ml, ip.cekj_100ml, ip.pr_100ml, ip.gt_100ml, ip.gs_100ml, ip.gtr_100ml, ip.hdc_100ml,
+  ip.az_100ml, ip.aza_100ml, ip.fbd_100ml, ip.so_100ml,
+  
+  ip.cekc_porcion, ip.cekj_porcion, ip.pr_porcion, ip.gt_porcion, ip.gs_porcion, ip.gtr_porcion, ip.hdc_porcion,
+  ip.az_porcion, ip.aza_porcion, ip.fbd_porcion, ip.so_porcion,
+
+  ip.cekctev, ip.cekjtev,
+
+  ip.ex_azucares_libres, ip.ex_azucares, ip.ex_grasas_s, ip.ex_grasas_t, ip.ex_sodio, ip.ex_sodio2,
+
+  ip.sellos_exceso_calorias, ip.sellos_exceso_azucares, ip.sellos_exceso_grasas_saturadas,
+  ip.sellos_exceso_grasas_trans, ip.sellos_exceso_sodio, ip.sellos_exceso_sodio2,
+
+  ip.exceso_ca, ip.exceso_so, ip.exceso_gt, ip.exceso_az, ip.exceso_gs,
+
+  ip.contenido_neto
+
+FROM documentos_generados dg
+INNER JOIN informacion_preparacion ip 
+  ON dg.id_preparacion = ip.id_preparacion
+WHERE dg.nombre_archivo = $1
+  AND dg.eliminado = FALSE;
+  `;
+
+  const values = [nombreArchivo];
+  const result = await db.query(sql, values);
+  return result.rows[0]; // Devuelve { id_declaracion_nutrimental: X }
+}
 
 }
 

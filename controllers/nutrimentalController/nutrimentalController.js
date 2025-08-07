@@ -1,6 +1,7 @@
 import { generarFechaFormatoReporte, formatearFechaCorta } from '../../utils/fecha.js';
 import { generateWordFromTemplate } from "../../services/nutrimentalWordService.js";
 import NutrimentalModel from '../../models/nutrimentalModel/nutrimentalModel.js';
+import db from "../../config/db.js";
 
 class NutrimentalController {
     /**
@@ -12,9 +13,13 @@ class NutrimentalController {
         // Los datos se obtienen del cuerpo de la solicitud (Angular), no son hardcodeados.
         try {
             const dataForm = req.body;
+            const usarCombinacion = dataForm.combinarProducto === true;
             console.log("Datos recibidos para generar el informe:", dataForm);
             const { productoBase, ingredienteCombinar, porcionFinal } = dataForm;
 
+            if (!usarCombinacion) {
+                return res.status(400).json({ error: 'Faltan datos del ingrediente a combinar' });
+            }
             const fechaCreacion = generarFechaFormatoReporte();
 
             // --- Datos base del producto en polvo (por 100g) ---
@@ -253,6 +258,180 @@ class NutrimentalController {
                 message: "Error al generar el reporte Word.",
                 error: error.message,
             });
+        }
+    }
+
+
+    static async descargarWord(req, res) {
+        try {
+            const nombreArchivo = req.params.nombreArchivo;
+
+            const declaracionNutrimental = await NutrimentalModel.getInfoDocumentos(nombreArchivo);
+
+            console.log("Declaracion Nutrimental:", declaracionNutrimental);
+            if (!declaracionNutrimental) {
+                return res.status(404).json({ message: 'No se encontró información de la declaración nutrimental.' });
+            }
+
+            const idMuestra = declaracionNutrimental.idmuestra;
+            if (!idMuestra) {
+                return res.status(400).json({ message: 'No se encontró idmuestra en los datos de la declaración nutrimental.' });
+            }
+
+            const muestra = await db.query(`
+              SELECT
+        a.idanalisis,
+        a.idmuestra,
+        a.folio,
+        a.analista,
+        m.descripcion AS muestra_descripcion,
+        afd.resultado AS fibra_resultado,
+        acr.resultado AS carbohidratos_resultado,
+        asd.resultado AS sodio_resultado,
+        aen.resultadoKcal AS energetico_kcal,
+        aen.resultadoKj AS energetico_kj,
+		aen.azucares AS azucares,
+        aen.azucaresAnidados AS azucaresanidados,
+        aag.resultadoTrans AS grasas_trans,
+        aag.resultadoSaturadas AS grasas_saturadas,
+        aag.total AS grasas_total,
+		ap.resultado AS proteinas_resultado
+      FROM muestra m
+      JOIN analisis a ON a.idMuestra = m.idMuestra
+      LEFT JOIN analisishumedad ah ON ah.idAnalisis = a.idAnalisis
+      LEFT JOIN analisisproteinas ap ON ap.idAnalisis = a.idAnalisis
+      LEFT JOIN analisiscenizas ac ON ac.idAnalisis = a.idAnalisis
+      LEFT JOIN analisisfibradietetica afd ON afd.idAnalisis = a.idAnalisis
+      LEFT JOIN analisiscarbohidratos acr ON acr.idAnalisis = a.idAnalisis
+      LEFT JOIN analisissodio asd ON asd.idAnalisis = a.idAnalisis
+      LEFT JOIN analisisenergetico aen ON aen.idAnalisis = a.idAnalisis
+      LEFT JOIN analisisacidosgrasos aag ON aag.idAnalisis = a.idAnalisis
+      WHERE m.idMuestra = $1
+    `, [idMuestra]);
+
+            if (muestra.rows.length === 0) {
+                return res.status(404).json({ message: 'No se encontraron datos de análisis para esta muestra.' });
+            }
+
+            console.log("Datos muestra:", muestra.rows[0]);
+
+            const datos = muestra.rows[0]; // ✅
+
+            // Construimos el objeto con datos para usarlo (por ejemplo para generar Word)
+
+            const fecha = generarFechaFormatoReporte(new Date(declaracionNutrimental.fecha_generado));
+            const data = {
+                pp: 100,
+                folio: datos.folio,
+                producto: datos.muestra_descripcion,
+                CEKC: datos.energetico_kcal,
+                CEKJ: datos.energetico_kj,
+                PR: datos.proteinas_resultado,
+                GT: datos.grasas_total,
+                GS: datos.grasas_saturadas,
+                GTR: datos.grasas_trans,
+                HDC: datos.carbohidratos_resultado,
+                AZ: datos.azucares,
+                AZA: datos.azucaresanidados,
+                FBD: datos.fibra_resultado,
+                SO: datos.sodio_resultado,
+                fecha: fecha,
+                analista: datos.analista,
+                CEKCT: Number(((datos.energetico_kcal * declaracionNutrimental.contenido_neto) / 100).toFixed(2)),
+                CEKJT: Number(((datos.energetico_kj * declaracionNutrimental.contenido_neto) / 100).toFixed(2)),
+                CNT: declaracionNutrimental.contenido_neto,
+                preparacion: declaracionNutrimental.preparacion,
+
+                // Columna "Por 100 ml de producto preparado"
+                CEKC_100ml: declaracionNutrimental.cekc_100ml,
+                CEKJ_100ml: declaracionNutrimental.cekj_100ml,
+                PR_100ml: declaracionNutrimental.pr_100ml,
+                GT_100ml: declaracionNutrimental.gt_100ml,
+                GS_100ml: declaracionNutrimental.gs_100ml,
+                GTR_100ml: declaracionNutrimental.gtr_100ml,
+                HDC_100ml: declaracionNutrimental.hdc_100ml,
+                AZ_100ml: declaracionNutrimental.az_100ml,
+                AZA_100ml: declaracionNutrimental.aza_100ml,
+                FBD_100ml: declaracionNutrimental.fbd_100ml,
+                SO_100ml: declaracionNutrimental.so_100ml,
+
+                // Columna "Por porción preparada"
+                CEKC_porcion: declaracionNutrimental.cekc_porcion,
+                CEKJ_porcion: declaracionNutrimental.cekj_porcion,
+                PR_porcion: declaracionNutrimental.pr_porcion,
+                GT_porcion: declaracionNutrimental.gt_porcion,
+                GS_porcion: declaracionNutrimental.gs_porcion,
+                GTR_porcion: declaracionNutrimental.gtr_porcion,
+                HDC_porcion: declaracionNutrimental.hdc_porcion,
+                AZ_porcion: declaracionNutrimental.az_porcion,
+                AZA_porcion: declaracionNutrimental.aza_porcion,
+                FBD_porcion: declaracionNutrimental.fbd_porcion,
+                SO_porcion: declaracionNutrimental.so_porcion,
+
+                CEKCTEV: declaracionNutrimental.cekctev,
+                CEKJTEV: declaracionNutrimental.cekjtev,
+
+                exAzucaresLibres: declaracionNutrimental.ex_azucares_libres,
+                exAzucares: declaracionNutrimental.ex_azucares,
+                exGrasasS: declaracionNutrimental.ex_grasas_s,
+                exGrasasT: declaracionNutrimental.ex_grasas_t,
+                exSodio: declaracionNutrimental.ex_sodio,
+                exSodio2: declaracionNutrimental.ex_sodio2,
+                sellosExcesoCalorias: declaracionNutrimental.sellos_exceso_calorias,
+                sellosExcesoCalorias: declaracionNutrimental.sellos_exceso_calorias,
+                sellosExcesoAzucares: declaracionNutrimental.sellos_exceso_azucares,
+                sellosExcesoGrasasSaturadas: declaracionNutrimental.sellos_exceso_grasas_saturadas,
+                sellosExcesoGrasasTrans: declaracionNutrimental.sellos_exceso_grasas_trans,
+                sellosExcesoSodio: declaracionNutrimental.sellos_exceso_sodio,
+                sellosExcesoSodio2: declaracionNutrimental.sellos_exceso_sodio2,
+                excesoCA: declaracionNutrimental.exceso_ca,
+                excesoSO: declaracionNutrimental.exceso_so,
+                excesoGT: declaracionNutrimental.exceso_gt,
+                excesoAZ: declaracionNutrimental.exceso_az,
+                excesoGS: declaracionNutrimental.exceso_gs,
+                contenidoNeto: declaracionNutrimental.contenido_neto,
+            }
+
+            const docxBuffer = generateWordFromTemplate(data);
+
+            return res
+                .status(200)
+                .set({
+                    "Content-Type":
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "Content-Disposition": 'attachment; filename="reporte.docx"',
+                })
+                .send(docxBuffer);
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Error interno en el servidor." });
+        }
+    }
+
+    static async getDocumentosNutricionales(req, res) {
+        try {
+            const declaracionNutrimental = await NutrimentalModel.getAllDocumentosGenerados();
+            res.json(declaracionNutrimental);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    static async deleteNutrimentalDoc(req, res) {
+        const { id } = req.params;
+
+        try {
+            const result = await NutrimentalModel.deleteNutrimentalDoc(id);
+
+            if (result.rowCount === 0) {
+                return res.status(404).json({ error: 'Documento nutrimental no encontrado' });
+            }
+
+            res.json({ message: 'Documento nutrimental eliminado correctamente' });
+        } catch (error) {
+            console.error('Error al eliminar documento nutrimental:', error);
+            res.status(500).json({ error: 'Error del servidor' });
         }
     }
 }
