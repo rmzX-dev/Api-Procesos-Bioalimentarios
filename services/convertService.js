@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import crypto from 'crypto';
 import ConvertApi from 'convertapi';
 
-const convertApi = ConvertApi('');
+const convertApi = ConvertApi('eHiSiw0yaqG2WCJlihr1wRMdyDRs0ATi');
 
 export async function docxToPdf(docxBuffer) {
   // 1) escribe un .docx temporal

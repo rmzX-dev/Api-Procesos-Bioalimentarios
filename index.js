@@ -19,13 +19,15 @@ import excelRoutes from "./routes/excelRoutes/excelRoutes.js";
 import folavRoutes from "./routes/folavRoutes/folavRoutes.js";
 import nutrimentalRoutes from './routes/nutrimentalRoutes/nutrimentalRoutes.js';
 import swaggerDocs from "./config/swagger.js";
+import cors from 'cors';
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
 
 dotenv.config();
 
 const app = express();
 
-app.use(corsConfig);
+//app.use(corsConfig);
+app.use(cors());
 app.use(express.json());
 
 // Usar swagger
