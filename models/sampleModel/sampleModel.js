@@ -60,6 +60,16 @@ class Muestra {
         return result.rows[0];
     }
 
+    static async deleteSample(idMuestra) {
+        const result = await pool.query(
+            `DELETE FROM muestra 
+            WHERE idMuestra = $1 
+            RETURNING *;`,
+            [idMuestra]
+        );
+        return result.rows[0];
+    }
+
 }
 
 export default Muestra;

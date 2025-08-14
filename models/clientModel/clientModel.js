@@ -56,6 +56,16 @@ class Cliente {
         return result.rows[0];
     }
 
+    static async deleteCliente(idCliente) {
+        const result = await pool.query(
+            `DELETE FROM clientes 
+            WHERE idcliente = $1 
+            RETURNING *;`,
+            [idCliente]
+        );
+        return result.rows[0];
+    }
+
 }
 
 export default Cliente;

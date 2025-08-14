@@ -6,5 +6,7 @@ const router = express.Router();
 router.get("/muestra", MuestraController.getAllSample);
 router.get("/muestra/:id", MuestraController.getSampleById);
 router.post("/muestra", MuestraController.createSample);
+router.put("/muestra/:id", MuestraController.updateSample);
+router.delete("/muestra/:id", MuestraController.deleteSample);
 
 export default router;
