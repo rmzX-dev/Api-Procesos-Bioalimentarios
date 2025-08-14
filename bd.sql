@@ -210,20 +210,6 @@ CREATE TABLE documentos_generados (
 );
 
 
-CREATE OR REPLACE FUNCTION soft_delete_informe()
-RETURNS TRIGGER AS $$
-BEGIN
-  UPDATE documentos_generados SET eliminado = TRUE WHERE id = OLD.id;
-  RETURN NULL; -- Evita la eliminación real
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_soft_delete_informe
-BEFORE DELETE ON documentos_generados
-FOR EACH ROW
-EXECUTE FUNCTION soft_delete_informe();
-
-
 
 -- Índices para mejorar el rendimiento
 CREATE INDEX idx_muestra_idcliente ON muestra(idCliente);
@@ -235,79 +221,22 @@ CREATE INDEX idx_folav_idusuario ON folav(idUsuario);
 
 
 
---SON LINIEAS DE CODIGOS PARA HACER COSAS
-SELECT
-    a.*,
-    m.descripcion AS muestra_descripcion,
-    c.razonSocial AS cliente_razon_social,
-	c.direccion AS cliente_direccion,
-    ah.resultado AS humedad_resultado,
-    ah.acreditacion AS humedad_acreditacion,
-    ap.resultado AS proteinas_resultado,
-    ap.acreditacion AS proteinas_acreditacion,
-    ac.resultado AS cenizas_resultado,
-    ac.acreditacion AS cenizas_acreditacion,
-    afd.resultado AS fibra_resultado,
-    afd.acreditacion AS fibra_acreditacion,
-    acr.resultado AS carbohidratos_resultado,
-    acr.acreditacion AS carbohidratos_acreditacion,
-    asd.resultado AS sodio_resultado,
-    asd.acreditacion AS sodio_acreditacion,
-    aen.resultadoKcal AS energetico_kcal,
-    aen.resultadoKj AS energetico_kj,
-    aen.acreditacion AS energetico_acreditacion,
-    aag.resultadoTrans AS grasas_trans,
-    aag.resultadoSaturadas AS grasas_saturadas,
-    aag.resultadoMonoinsaturados AS grasas_monoinsaturadas,
-    aag.resultadoPolyinsaturados AS grasas_polyinsaturadas,
-    aag.total AS grasas_total,
-    aag.acreditacion AS grasas_acreditacion,
-    f.idHistorial,
-    f.fechaGeneracion AS folav_fecha
-FROM analisis a
-JOIN muestra m ON m.idMuestra = a.idMuestra
-JOIN clientes c ON c.idCliente = m.idCliente
-
-LEFT JOIN analisishumedad ah ON ah.idAnalisis = a.idAnalisis
-LEFT JOIN analisisproteinas ap ON ap.idAnalisis = a.idAnalisis
-LEFT JOIN analisiscenizas ac ON ac.idAnalisis = a.idAnalisis
-LEFT JOIN analisisfibradietetica afd ON afd.idAnalisis = a.idAnalisis
-LEFT JOIN analisiscarbohidratos acr ON acr.idAnalisis = a.idAnalisis
-LEFT JOIN analisissodio asd ON asd.idAnalisis = a.idAnalisis
-LEFT JOIN analisisenergetico aen ON aen.idAnalisis = a.idAnalisis
-LEFT JOIN analisisacidosgrasos aag ON aag.idAnalisis = a.idAnalisis
-
-LEFT JOIN folav f ON f.idAnalisis = a.idAnalisis
-
-WHERE a.idAnalisis = 4;
-
-
-
-SELECT * FROM folav;
-
-SELECT * FROM clientes;
-
-SELECT 
-            f.idHistorial,
-			f.idAnalisis,
-            CONCAT('FOLAB-', a.folio) AS folio,
-            c.razonSocial AS cliente,
-            f.fechaGeneracion,
-            m.descripcion AS muestra
-        FROM folav f
-        JOIN analisis a ON f.idAnalisis = a.idAnalisis
-        JOIN muestra m ON a.idMuestra = m.idMuestra
-        JOIN clientes c ON m.idCliente = c.idCliente
-        ORDER BY f.fechaGeneracion DESC;
-
 ALTER TABLE folav ADD COLUMN eliminado BOOLEAN DEFAULT FALSE;
 
+
+-- ====================================
+-- TRIGGER DE BORRADO LÓGICO PARA FOLAV
+-- ====================================
 CREATE OR REPLACE FUNCTION trigger_eliminar_logicamente_folav()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Marcar el registro como eliminado en lugar de borrarlo
-  UPDATE folav SET eliminado = TRUE WHERE idHistorial = OLD.idHistorial;
-  RETURN NULL; -- Evitar la eliminación real
+  -- Marcar como eliminado
+  UPDATE folav 
+  SET eliminado = TRUE 
+  WHERE idhistorial = OLD.idhistorial;
+
+  -- Evitar borrado físico
+  RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -315,3 +244,25 @@ CREATE TRIGGER before_delete_folav
 BEFORE DELETE ON folav
 FOR EACH ROW
 EXECUTE FUNCTION trigger_eliminar_logicamente_folav();
+
+
+-- ==============================================
+-- TRIGGER DE BORRADO LÓGICO PARA DOCUMENTOS_GENERADOS
+-- ==============================================
+CREATE OR REPLACE FUNCTION soft_delete_documentos_generados()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Marcar como eliminado
+  UPDATE documentos_generados 
+  SET eliminado = TRUE 
+  WHERE id_declaracion_nutrimental = OLD.id_declaracion_nutrimental;
+
+  -- Evitar borrado físico
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_soft_delete_documentos_generados
+BEFORE DELETE ON documentos_generados
+FOR EACH ROW
+EXECUTE FUNCTION soft_delete_documentos_generados();
