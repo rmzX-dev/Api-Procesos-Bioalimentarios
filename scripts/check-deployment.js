@@ -26,8 +26,8 @@ const checks = [
     check: (content) => content.includes('web:')
   },
   {
-    name: 'app.js',
-    path: '../app.js',
+    name: 'index.js',
+    path: '../index.js',
     required: true,
     check: (content) => content.includes('process.env.PORT')
   },

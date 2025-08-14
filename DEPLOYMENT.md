@@ -70,9 +70,17 @@ Una vez desplegado, puedes verificar:
 
 ## Troubleshooting
 
+### Error de Health Check
+Si ves errores como "Healthcheck failed" o "service unavailable":
+1. Verifica que la variable `DATABASE_URL` esté configurada correctamente
+2. Asegúrate de que la base de datos esté accesible desde Railway
+3. Revisa los logs de la aplicación en Railway
+4. El health check verifica `/health` y la conexión a la base de datos
+
 ### Error de Conexión a Base de Datos
 - Verifica que `DATABASE_URL` esté correctamente configurada
 - Asegúrate de que la base de datos esté accesible desde Railway
+- Formato esperado: `postgresql://usuario:contraseña@host:puerto/base_datos`
 
 ### Error de Puerto
 - Railway configura automáticamente el puerto
@@ -81,6 +89,11 @@ Una vez desplegado, puedes verificar:
 ### Error de Build
 - Verifica que todas las dependencias estén en `package.json`
 - Revisa los logs de build en Railway
+- Asegúrate de que el archivo principal sea `index.js`
+
+### Error de Timeout
+- El health check tiene un timeout de 600 segundos
+- Si tu aplicación tarda mucho en iniciar, considera optimizar el startup
 
 ## Monitoreo
 

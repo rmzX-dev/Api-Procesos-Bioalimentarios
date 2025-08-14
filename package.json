@@ -2,14 +2,14 @@
   "name": "api-procesos-bioalimentarios",
   "version": "1.0.0",
   "description": "API RESTful para la gestión integral de usuarios y perfiles en sistemas de procesos bioalimentarios, con autenticación JWT y operaciones CRUD.",
-  "main": "app.js",
+  "main": "index.js",
   "type": "module",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "check-deployment": "node scripts/check-deployment.js"
   },

@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import corsConfig from "./config/cors.js";
+import { serverConfig } from "./config/server.js";
 
 import analysisRoutes from "./routes/analysisRoutes/analysisRoutes.js";
 import ashesRoutes from "./routes/ashesRoutes/ashesRoutes.js";
@@ -47,17 +48,31 @@ app.use("/api", userRoutes);
 app.use("/api", folavRoutes);
 app.use("/api", nutrimentalRoutes);
 
-// Middleware de manejo de errores (debe ir después de todas las rutas)
-app.use(notFoundHandler);
-app.use(errorHandler);
-
-// Ruta de health check para Railway
-app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
-    message: 'API funcionando correctamente',
-    timestamp: new Date().toISOString()
-  });
+// Ruta de health check para Railway (ANTES del middleware de errores)
+app.get('/health', async (req, res) => {
+  try {
+    // Verificar conexión a la base de datos
+    const pool = await import('./config/db.js');
+    const client = await pool.default.connect();
+    await client.query('SELECT 1');
+    client.release();
+    
+    res.status(200).json({ 
+      status: 'OK', 
+      message: 'API funcionando correctamente',
+      database: 'Connected',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(503).json({ 
+      status: 'ERROR', 
+      message: 'API no está funcionando correctamente',
+      database: 'Disconnected',
+      error: process.env.NODE_ENV === 'production' ? 'Database connection failed' : error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Ruta raíz
@@ -70,11 +85,53 @@ app.get('/', (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || '0.0.0.0';
+// Ruta /api para health check fallback
+app.get('/api', (req, res) => {
+  res.json({ 
+    message: 'API de Procesos Bioalimentarios',
+    status: 'OK',
+    availableEndpoints: [
+      '/api/users',
+      '/api/samples',
+      '/api/analysis',
+      '/api/clients',
+      '/health',
+      '/api-docs'
+    ]
+  });
+});
 
-app.listen(PORT, HOST, () => {
+// Middleware de manejo de errores (debe ir DESPUÉS de todas las rutas)
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+const PORT = process.env.PORT || serverConfig.port;
+const HOST = process.env.HOST || serverConfig.host;
+
+const server = app.listen(PORT, HOST, () => {
   console.log(`🚀 Servidor corriendo en http://${HOST}:${PORT}`);
   console.log(`📚 Documentación disponible en http://${HOST}:${PORT}/api-docs`);
   console.log(`🏥 Health check en http://${HOST}:${PORT}/health`);
+});
+
+// Configurar timeouts del servidor
+server.timeout = serverConfig.timeout;
+server.keepAliveTimeout = serverConfig.keepAliveTimeout;
+server.headersTimeout = serverConfig.headersTimeout;
+
+// Manejo de señales para cierre graceful
+process.on('SIGTERM', () => {
+  console.log('SIGTERM recibido, cerrando servidor...');
+  server.close(() => {
+    console.log('Servidor cerrado');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT recibido, cerrando servidor...');
+  server.close(() => {
+    console.log('Servidor cerrado');
+    process.exit(0);
+  });
 });
