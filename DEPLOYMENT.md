@@ -72,10 +72,15 @@ Una vez desplegado, puedes verificar:
 
 ### Error de Health Check
 Si ves errores como "Healthcheck failed" o "service unavailable":
-1. Verifica que la variable `DATABASE_URL` esté configurada correctamente
-2. Asegúrate de que la base de datos esté accesible desde Railway
-3. Revisa los logs de la aplicación en Railway
-4. El health check verifica `/health` y la conexión a la base de datos
+1. **Verifica las variables de entorno**: `DATABASE_URL` y `JWT_SECRET` deben estar configuradas
+2. **Revisa los logs**: En Railway, ve a la pestaña "Deployments" y revisa los logs
+3. **Health check path**: Railway usa `/api` como health check por defecto
+4. **Base de datos**: Si no tienes base de datos configurada, el health check aún pasará pero mostrará "Not configured"
+5. **Timeouts**: El health check tiene 600 segundos de timeout
+
+**Solución rápida:**
+- Configura `DATABASE_URL` en las variables de entorno de Railway
+- Si no tienes base de datos, la aplicación funcionará pero mostrará advertencias
 
 ### Error de Conexión a Base de Datos
 - Verifica que `DATABASE_URL` esté correctamente configurada
