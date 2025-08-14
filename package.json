@@ -9,7 +9,9 @@
   },
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "check-deployment": "node scripts/check-deployment.js"
   },
   "keywords": [],
   "author": "",
@@ -35,6 +37,7 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "@types/pizzip": "^3.1.2"
+    "@types/pizzip": "^3.1.2",
+    "nodemon": "^3.0.1"
   }
 }

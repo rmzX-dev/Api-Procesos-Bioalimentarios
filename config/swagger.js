@@ -14,7 +14,6 @@ const swaggerDocument = YAML.load(path.join(__dirname, "../docs/swagger.yaml"));
 
 const swaggerDocs = (app) => {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-  console.log(`Swagger docs disponibles en http://localhost:${process.env.PORT || 3000}/api-docs`);
 };
 
 export default swaggerDocs;
