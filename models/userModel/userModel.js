@@ -27,6 +27,12 @@ class User {
       contrasenia,
       telefono,
     } = data;
+
+    const emailRegex = /^[^\s@]+@utcv\.edu\.mx$/i;
+    if (!emailRegex.test(correo)) {
+      throw new Error("El correo debe pertenecer al dominio @utcv.edu.mx");
+    }
+
     const hashedPassword = await bcrypt.hash(contrasenia, SALT_ROUNDS);
     const result = await pool.query(
       "INSERT INTO usuarios (nombre, apellidoPaterno, apellidoMaterno, correo, contrasenia, telefono) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
@@ -41,7 +47,6 @@ class User {
     );
     return result.rows[0];
   }
-
 
   static async updateUser(idusuario, data) {
     const {
@@ -67,7 +72,13 @@ class User {
       hashedPassword = currentUser.rows[0].contrasenia;
     }
 
-    if (!nombre || !apellidoPaterno || !apellidoMaterno || !correo || !telefono) {
+    if (
+      !nombre ||
+      !apellidoPaterno ||
+      !apellidoMaterno ||
+      !correo ||
+      !telefono
+    ) {
       throw new Error("Faltan campos obligatorios para actualizar");
     }
 
@@ -106,8 +117,6 @@ class User {
     );
     return result.rows[0];
   }
-
-
 
   static async loginUser(data) {
     const { correo, contrasenia } = data;
