@@ -160,7 +160,7 @@ LEFT JOIN
 LEFT JOIN
     analisissodio aso ON a.idanalisis = aso.idanalisis
 LEFT JOIN
-    analisisenergetico ae ON a.idanalisis = ae.idanalisis 
+    analisissenergetico ae ON a.idanalisis = ae.idanalisis 
 LEFT JOIN
     analisisacidosgrasos aag ON a.idanalisis = aag.idanalisis 
 LEFT JOIN
